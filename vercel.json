@@ -1,0 +1,16 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "env": {
+    "NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID": "2f5a2b1c8d3e4f5a6b7c8d9e0f1a2b3c",
+    "NEXT_PUBLIC_MULTI_CONTRACT_ADDRESS": "0xd571Ef424422BD0F843E8026d7Fa5808879B1B81"
+  },
+  "functions": {
+    "pages/api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}

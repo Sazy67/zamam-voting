@@ -1,0 +1,46 @@
+{
+  "name": "gizli-oy-sistemi",
+  "version": "1.0.0",
+  "description": "Confidential Voting dApp using Zama FHEVM",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "compile": "hardhat compile",
+    "deploy-multi": "hardhat run scripts/deploy-multi.js --network sepolia",
+    "deploy-zama-simple": "hardhat run scripts/deploy-zama-simple.js --network zama",
+    "deploy-zama-advanced": "hardhat run scripts/deploy-zama-advanced.js --network zama",
+    "deploy-all": "npm run deploy-multi && npm run deploy-zama-simple",
+    "test": "hardhat test",
+    "vercel-build": "npm run build"
+  },
+  "dependencies": {
+    "@fhevm/solidity": "^0.8.0",
+    "@openzeppelin/confidential-contracts": "https://gitpkg.vercel.app/OpenZeppelin/openzeppelin-confidential-contracts/contracts?chore/migrate-0.2-0.8.0",
+    "@rainbow-me/rainbowkit": "^1.3.0",
+    "@zama-fhe/relayer-sdk": "^0.2.0",
+    "dotenv": "^17.2.3",
+    "ethers": "^6.8.0",
+    "fhevm": "^0.6.2",
+    "fhevmjs": "^0.6.2",
+    "next": "^14.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "viem": "^1.19.0",
+    "wagmi": "^1.4.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "autoprefixer": "^10.4.0",
+    "hardhat": "^2.19.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.0.0"
+  }
+}
