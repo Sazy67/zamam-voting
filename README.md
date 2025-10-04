@@ -199,9 +199,10 @@ git push origin main
 
 4. **Deploy Durumu:**
    - ✅ Contract deployed: Sepolia testnet
+   - ✅ ZamaAdvanced Contract: `0x56fa223eA0B5EcA089E4E7fDb304302162Cb8FF0`
    - ✅ Owner: `0x8c82BaEe92C489270C89a88DF45de7F6bd864bA5`
-   - ✅ Vercel config: `vercel.json` hazır
-   - ✅ Production env: `.env.production` hazır
+   - ✅ Vercel Live: https://zamam-3ef8w72sj-suat-ayazs-projects.vercel.app
+   - ✅ Production ready: Demo mode aktif
 
 ### Manuel Deploy
 ```bash
@@ -212,10 +213,21 @@ vercel --prod
 
 ## 🔗 Canlı Demo
 
-- **Ana Sayfa**: Sistem seçimi ve genel bakış
-- **Klasik Oylama**: Standart blockchain oylama
-- **Zama Şifreli**: Tam gizlilik ile oylama
-- **Admin Panelleri**: Her iki sistem için yönetim
+🌐 **Live Demo**: https://zamam-3ef8w72sj-suat-ayazs-projects.vercel.app
+
+### 📱 Sayfalar
+- **Ana Sayfa** (`/`): Sistem seçimi ve genel bakış
+- **Klasik Oylama** (`/vote`): Standart blockchain oylama
+- **Zama Şifreli** (`/zama-vote`): Tam gizlilik ile oylama
+- **Zama Gelişmiş** (`/zama-advanced-vote`): Çoklu seçenek şifreli oylama
+- **Admin Panelleri**: Her sistem için yönetim arayüzü
+
+### 🎮 Demo Özellikleri
+- ✅ Cüzdan bağlama (MetaMask)
+- ✅ Çoklu oylama sistemi
+- ✅ Gerçek zamanlı arayüz
+- ✅ Responsive tasarım
+- ✅ Demo veriler ile test
 
 ## 🌐 Network Bilgileri
 

@@ -41,6 +41,12 @@ Name: NEXT_PUBLIC_ZAMA_CONTRACT_ADDRESS
 Value: [Zama deploy sonrası]
 ```
 
+**Zama Advanced Contract:**
+```
+Name: NEXT_PUBLIC_ZAMA_ADVANCED_CONTRACT_ADDRESS
+Value: [Advanced contract deploy sonrası]
+```
+
 **Zama Public Key:**
 ```
 Name: NEXT_PUBLIC_ZAMA_PUBLIC_KEY

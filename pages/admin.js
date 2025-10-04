@@ -1,565 +1,904 @@
 import { useState, useEffect } from 'react';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite } from 'wagmi';
-import multiContractArtifact from '../artifacts/contracts/MultiVotingSystem.sol/MultiVotingSystem.json';
+import { ethers } from 'ethers';
 
-// Contract address from environment variable or fallback to local
-const getContractAddress = () => {
-  const envAddress = process.env.NEXT_PUBLIC_MULTI_CONTRACT_ADDRESS;
-  const fallbackAddress = '0xd571Ef424422BD0F843E8026d7Fa5808879B1B81';
-  
-  console.log('Contract Address Debug:', {
-    envAddress,
-    fallbackAddress,
-    finalAddress: envAddress || fallbackAddress
-  });
-  
-  return envAddress || fallbackAddress;
-};
+// Contract bilgileri
+const CONTRACT_ADDRESS = "0x9f2032a8Add12a036e3D529Ae1b21A0EDB9C63CB";
+const CONTRACT_ABI = [
+    "function owner() view returns (address)",
+    "function getVotingCount() view returns (uint256)",
+    "function getVotingInfo(uint256) view returns (string, string[], bool, bool, uint32[], uint256, uint256, uint256)",
+    "function createVoting(string, string[], uint256) returns (uint256)",
+    "function vote(uint256, uint32)",
+    "function startVoting(uint256)",
+    "function endVoting(uint256)",
+    "function revealResults(uint256)",
+    "function authorizeVoter(address)",
+    "function removeVoterAuthorization(address)",
+    "function hasVotedInVoting(uint256, address) view returns (bool)",
+    "function canVoteInVoting(uint256, address) view returns (bool)",
+    "function getTimeRemaining(uint256) view returns (uint256)",
+    "function getVoters(uint256) view returns (address[])",
+    "function deleteVoting(uint256)",
+    "function isVotingDeleted(uint256) view returns (bool)"
+];
 
-export default function AdminPage() {
-  const { address, isConnected } = useAccount();
-  const [mounted, setMounted] = useState(false);
-  const [newProposal, setNewProposal] = useState('');
-  const [selectedVotingId, setSelectedVotingId] = useState(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const contractAddress = getContractAddress();
-
-  // Contract reads
-  const { data: owner } = useContractRead({
-    address: contractAddress,
-    abi: multiContractArtifact.abi,
-    functionName: 'owner',
-    enabled: !!contractAddress,
-  });
-
-  const { data: votingCount } = useContractRead({
-    address: contractAddress,
-    abi: multiContractArtifact.abi,
-    functionName: 'getVotingCount',
-    watch: true,
-    enabled: !!contractAddress,
-  });
-
-  const { data: allVotingIds } = useContractRead({
-    address: contractAddress,
-    abi: multiContractArtifact.abi,
-    functionName: 'getAllVotingIds',
-    watch: true,
-    enabled: !!contractAddress,
-  });
-
-  // Create voting
-  const { config: createVotingConfig } = usePrepareContractWrite({
-    address: contractAddress,
-    abi: multiContractArtifact.abi,
-    functionName: 'createVoting',
-    args: [newProposal],
-    enabled: !!newProposal && !!contractAddress,
-  });
-
-  const { write: createVoting, isLoading: createLoading } = useContractWrite({
-    ...createVotingConfig,
-    onSuccess: () => {
-      alert('✅ Yeni oylama başarıyla oluşturuldu!');
-      setNewProposal('');
-    },
-    onError: (error) => {
-      console.error('Create voting error:', error);
-      alert('❌ Oylama oluşturma hatası: ' + error.message);
-    },
-  });
-
-  const isOwner = address && owner && address.toLowerCase() === owner.toLowerCase();
-  
-  // Debug bilgileri
-  console.log('Owner Check Debug:', {
-    address,
-    owner,
-    contractAddress,
-    isOwner,
-    addressLower: address?.toLowerCase(),
-    ownerLower: owner?.toLowerCase()
-  });
-
-  if (!mounted) {
-    return <div>Loading...</div>;
-  }
-
-  return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <h1>👑 Admin Panel - Oylama Yönetimi</h1>
-        <ConnectButton />
-      </div>
-
-      {!isConnected ? (
-        <div style={{ textAlign: 'center', padding: '50px' }}>
-          <h2>Lütfen cüzdanınızı bağlayın</h2>
-        </div>
-      ) : !isOwner ? (
-        <div style={{ textAlign: 'center', padding: '50px', border: '2px solid red', backgroundColor: '#ffe6e6' }}>
-          <h2>❌ Erişim Reddedildi</h2>
-          <p>Bu sayfaya sadece contract owner'ı erişebilir.</p>
-          <p><strong>Owner:</strong> {owner}</p>
-          <p><strong>Sen:</strong> {address}</p>
-        </div>
-      ) : (
-        <div>
-          {/* Yeni Oylama Oluştur */}
-          <div style={{ border: '2px solid green', padding: '20px', marginBottom: '30px', backgroundColor: '#e6ffe6' }}>
-            <h2>➕ Yeni Oylama Oluştur</h2>
-            <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Oylama Konusu:
-              </label>
-              <textarea
-                value={newProposal}
-                onChange={(e) => setNewProposal(e.target.value)}
-                placeholder="Örnek: 2024 yılında uzaktan çalışma politikası devam etsin mi?"
-                style={{ 
-                  width: '100%', 
-                  height: '80px', 
-                  padding: '10px', 
-                  border: '1px solid #ccc', 
-                  borderRadius: '5px',
-                  fontSize: '14px'
-                }}
-              />
-            </div>
-            <button
-              onClick={() => createVoting?.()}
-              disabled={createLoading || !createVoting || !newProposal.trim()}
-              style={{
-                padding: '12px 24px',
-                backgroundColor: 'green',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                fontSize: '16px',
-                cursor: 'pointer'
-              }}
-            >
-              {createLoading ? 'Oluşturuluyor...' : '✅ Oylama Oluştur'}
-            </button>
-          </div>
-
-          {/* İstatistikler */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '30px' }}>
-            <div style={{ border: '1px solid #ccc', padding: '20px', textAlign: 'center', backgroundColor: '#f9f9f9' }}>
-              <h3>📊 Toplam Oylama</h3>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: 'blue' }}>
-                {votingCount?.toString() || '0'}
-              </div>
-            </div>
-            
-            <div style={{ border: '1px solid #ccc', padding: '20px', textAlign: 'center', backgroundColor: '#f9f9f9' }}>
-              <h3>🏠 Contract</h3>
-              <div style={{ fontSize: '12px', wordBreak: 'break-all' }}>
-                {contractAddress || 'Contract adresi yükleniyor...'}
-              </div>
-            </div>
-          </div>
-
-          {/* Oylamalar Listesi */}
-          <div style={{ border: '2px solid blue', padding: '20px', backgroundColor: '#e6f3ff' }}>
-            <h2>📋 Tüm Oylamalar</h2>
-            
-            {!allVotingIds || allVotingIds.length === 0 ? (
-              <p>Henüz oylama oluşturulmamış. Yukarıdan yeni oylama oluşturun.</p>
-            ) : (
-              <div style={{ display: 'grid', gap: '15px' }}>
-                {allVotingIds.map((votingId) => (
-                  <VotingCard 
-                    key={votingId.toString()} 
-                    votingId={votingId} 
-                    contractAddress={contractAddress}
-                    contractAbi={multiContractArtifact.abi}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Voting Card Component
-function VotingCard({ votingId, contractAddress, contractAbi }) {
-  const [showDetails, setShowDetails] = useState(false);
-  
-  // Voting info oku
-  const { data: votingInfo } = useContractRead({
-    address: contractAddress,
-    abi: contractAbi,
-    functionName: 'getVotingInfo',
-    args: [votingId],
-    watch: true,
-  });
-
-  // Detaylı bilgileri oku
-  const { data: votingDetails } = useContractRead({
-    address: contractAddress,
-    abi: contractAbi,
-    functionName: 'getVotingDetails',
-    args: [votingId],
-    watch: true,
-    enabled: showDetails,
-  });
-
-  // Oy veren adresleri oku
-  const { data: voters } = useContractRead({
-    address: contractAddress,
-    abi: contractAbi,
-    functionName: 'getVoters',
-    args: [votingId],
-    watch: true,
-    enabled: showDetails,
-  });
-
-  // Admin actions
-  const { config: startConfig } = usePrepareContractWrite({
-    address: contractAddress,
-    abi: contractAbi,
-    functionName: 'startVoting',
-    args: [votingId],
-  });
-
-  const { config: endConfig } = usePrepareContractWrite({
-    address: contractAddress,
-    abi: contractAbi,
-    functionName: 'endVoting',
-    args: [votingId],
-  });
-
-  const { config: revealConfig } = usePrepareContractWrite({
-    address: contractAddress,
-    abi: contractAbi,
-    functionName: 'revealResults',
-    args: [votingId],
-  });
-
-  const { write: startVoting, isLoading: startLoading } = useContractWrite({
-    ...startConfig,
-    onSuccess: () => alert('✅ Oylama başlatıldı!'),
-    onError: (error) => alert('❌ Hata: ' + error.message),
-  });
-
-  const { write: endVoting, isLoading: endLoading } = useContractWrite({
-    ...endConfig,
-    onSuccess: () => alert('✅ Oylama bitirildi!'),
-    onError: (error) => alert('❌ Hata: ' + error.message),
-  });
-
-  const { write: revealResults, isLoading: revealLoading } = useContractWrite({
-    ...revealConfig,
-    onSuccess: () => alert('✅ Sonuçlar açıklandı!'),
-    onError: (error) => alert('❌ Hata: ' + error.message),
-  });
-
-  if (!votingInfo) {
-    return <div>Yükleniyor...</div>;
-  }
-
-  const [proposal, active, resultsRevealed, finalYesVotes, finalNoVotes, createdAt] = votingInfo;
-
-  return (
-    <div style={{ 
-      border: '1px solid #ddd', 
-      padding: '15px', 
-      borderRadius: '8px',
-      backgroundColor: active ? '#fff3cd' : resultsRevealed ? '#d1ecf1' : '#f8f9fa'
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
-        <div style={{ flex: 1 }}>
-          <h3 style={{ margin: '0 0 10px 0' }}>#{votingId.toString()}: {proposal}</h3>
-          <div style={{ display: 'flex', gap: '10px', fontSize: '12px' }}>
-            <span style={{ 
-              padding: '2px 8px', 
-              borderRadius: '12px', 
-              backgroundColor: active ? 'green' : resultsRevealed ? 'blue' : 'gray',
-              color: 'white'
-            }}>
-              {active ? '🟢 Aktif' : resultsRevealed ? '📊 Tamamlandı' : '⏸️ Beklemede'}
-            </span>
-            <span>📅 {new Date(Number(createdAt) * 1000).toLocaleDateString('tr-TR')}</span>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {!active && !resultsRevealed && (
-            <button
-              onClick={() => startVoting?.()}
-              disabled={startLoading || !startVoting}
-              style={{ padding: '6px 12px', backgroundColor: 'green', color: 'white', border: 'none', borderRadius: '4px', fontSize: '12px' }}
-            >
-              {startLoading ? '...' : '▶️ Başlat'}
-            </button>
-          )}
-
-          {active && (
-            <button
-              onClick={() => endVoting?.()}
-              disabled={endLoading || !endVoting}
-              style={{ padding: '6px 12px', backgroundColor: 'orange', color: 'white', border: 'none', borderRadius: '4px', fontSize: '12px' }}
-            >
-              {endLoading ? '...' : '⏹️ Bitir'}
-            </button>
-          )}
-
-          {!active && !resultsRevealed && (
-            <button
-              onClick={() => revealResults?.()}
-              disabled={revealLoading || !revealResults}
-              style={{ padding: '6px 12px', backgroundColor: 'purple', color: 'white', border: 'none', borderRadius: '4px', fontSize: '12px' }}
-            >
-              {revealLoading ? '...' : '📊 Sonuç'}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Sonuçlar */}
-      {resultsRevealed && (
-        <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#f0f8ff', borderRadius: '4px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center' }}>
-            <div>
-              <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'green' }}>✅ {finalYesVotes.toString()}</div>
-              <div style={{ fontSize: '12px' }}>Evet</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'red' }}>❌ {finalNoVotes.toString()}</div>
-              <div style={{ fontSize: '12px' }}>Hayır</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'blue' }}>
-                🏆 {Number(finalYesVotes) > Number(finalNoVotes) ? 'EVET' : 
-                     Number(finalNoVotes) > Number(finalYesVotes) ? 'HAYIR' : 'BERABERE'}
-              </div>
-              <div style={{ fontSize: '12px' }}>Kazanan</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'purple' }}>
-                👥 {(Number(finalYesVotes) + Number(finalNoVotes)).toString()}
-              </div>
-              <div style={{ fontSize: '12px' }}>Toplam Oy</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Detay Butonu */}
-      <div style={{ marginTop: '10px', textAlign: 'center' }}>
-        <button
-          onClick={() => setShowDetails(!showDetails)}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: showDetails ? '#dc3545' : '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            fontSize: '14px',
-            cursor: 'pointer'
-          }}
-        >
-          {showDetails ? '🔼 Detayları Gizle' : '🔽 Detayları Göster'}
-        </button>
-      </div>
-
-      {/* Detaylı Bilgiler */}
-      {showDetails && votingDetails && (
-        <VotingDetailsPanel 
-          votingId={votingId}
-          votingDetails={votingDetails}
-          voters={voters}
-          contractAddress={contractAddress}
-          contractAbi={contractAbi}
-        />
-      )}
-    </div>
-  );
-}
-
-
-
-// Voting Details Panel Component
-function VotingDetailsPanel({ votingId, votingDetails, voters, contractAddress, contractAbi }) {
-  if (!votingDetails) {
-    return <div style={{ padding: '20px', textAlign: 'center' }}>Detaylar yükleniyor...</div>;
-  }
-
-  const [
-    proposal,
-    active, 
-    resultsRevealed,
-    finalYesVotes,
-    finalNoVotes,
-    createdAt,
-    yesVotes,
-    noVotes,
-    totalVotes
-  ] = votingDetails;
-
-  return (
-    <div style={{ 
-      marginTop: '15px', 
-      padding: '20px', 
-      backgroundColor: '#f8f9fa', 
-      borderRadius: '8px',
-      border: '1px solid #dee2e6'
-    }}>
-      <h4 style={{ margin: '0 0 15px 0', color: '#495057' }}>📊 Detaylı Bilgiler</h4>
-      
-      {/* Temel Bilgiler */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '20px' }}>
-        <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e9ecef' }}>
-          <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '5px' }}>Oylama ID</div>
-          <div style={{ fontWeight: 'bold' }}>#{votingId.toString()}</div>
-        </div>
+export default function AdminPanel() {
+    const [account, setAccount] = useState('');
+    const [isOwner, setIsOwner] = useState(false);
+    const [votings, setVotings] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [activeSection, setActiveSection] = useState('dashboard');
+    
+    // Form states
+    const [proposal, setProposal] = useState('');
+    const [options, setOptions] = useState(['', '']);
+    const [duration, setDuration] = useState(24);
+    const [voterAddress, setVoterAddress] = useState('');
+    
+    // Stats
+    const [stats, setStats] = useState({
+        totalVotings: 0,
+        activeVotings: 0,
+        totalVotes: 0,
+        completedVotings: 0
+    });
+    
+    // Connect wallet
+    const connectWallet = async () => {
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                const address = await signer.getAddress();
+                setAccount(address);
+                
+                // Check if owner
+                const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+                const owner = await contract.owner();
+                setIsOwner(address.toLowerCase() === owner.toLowerCase());
+                
+                if (address.toLowerCase() === owner.toLowerCase()) {
+                    await loadData();
+                }
+            } catch (error) {
+                console.error('Wallet connection failed:', error);
+            }
+        } else {
+            alert('MetaMask bulunamadı! Lütfen MetaMask yükleyin.');
+        }
+    };
+    
+    // Load all data
+    const loadData = async () => {
+        await Promise.all([loadVotings(), loadStats()]);
+    };
+    
+    // Load votings
+    const loadVotings = async () => {
+        if (!account) return;
         
-        <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e9ecef' }}>
-          <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '5px' }}>Durum</div>
-          <div style={{ fontWeight: 'bold' }}>
-            {active ? '🟢 Aktif' : resultsRevealed ? '📊 Tamamlandı' : '⏸️ Beklemede'}
-          </div>
-        </div>
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+            
+            const count = await contract.getVotingCount();
+            const votingList = [];
+            
+            for (let i = 0; i < Number(count); i++) {
+                // Check if voting is deleted
+                const isDeleted = await contract.isVotingDeleted(i);
+                if (isDeleted) continue; // Skip deleted votings
+                
+                const info = await contract.getVotingInfo(i);
+                const timeRemaining = await contract.getTimeRemaining(i);
+                
+                // Skip if proposal is empty (deleted voting)
+                if (!info[0]) continue;
+                
+                votingList.push({
+                    id: i,
+                    proposal: info[0],
+                    options: info[1],
+                    active: info[2],
+                    resultsRevealed: info[3],
+                    finalVotes: info[4].map(v => Number(v)),
+                    createdAt: new Date(Number(info[5]) * 1000),
+                    endTime: new Date(Number(info[6]) * 1000),
+                    totalVoters: Number(info[7]),
+                    timeRemaining: Number(timeRemaining)
+                });
+            }
+            
+            setVotings(votingList);
+        } catch (error) {
+            console.error('Error loading votings:', error);
+        }
+    };
+    
+    // Load stats
+    const loadStats = async () => {
+        if (!account) return;
         
-        <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e9ecef' }}>
-          <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '5px' }}>Oluşturulma</div>
-          <div style={{ fontWeight: 'bold' }}>
-            {new Date(Number(createdAt) * 1000).toLocaleString('tr-TR')}
-          </div>
-        </div>
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+            
+            const count = await contract.getVotingCount();
+            let activeCount = 0;
+            let totalVotes = 0;
+            let completedCount = 0;
+            
+            for (let i = 0; i < Number(count); i++) {
+                const info = await contract.getVotingInfo(i);
+                const active = info[2];
+                const resultsRevealed = info[3];
+                const voterCount = Number(info[7]);
+                
+                if (active) activeCount++;
+                if (resultsRevealed) completedCount++;
+                totalVotes += voterCount;
+            }
+            
+            setStats({
+                totalVotings: Number(count),
+                activeVotings: activeCount,
+                totalVotes,
+                completedVotings: completedCount
+            });
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+    };
+    
+    // Create voting
+    const createVoting = async () => {
+        if (!proposal.trim() || options.some(opt => !opt.trim())) {
+            alert('Lütfen tüm alanları doldurun!');
+            return;
+        }
         
-        <div style={{ padding: '10px', backgroundColor: 'white', borderRadius: '4px', border: '1px solid #e9ecef' }}>
-          <div style={{ fontSize: '12px', color: '#6c757d', marginBottom: '5px' }}>Toplam Katılım</div>
-          <div style={{ fontWeight: 'bold', color: '#007bff' }}>
-            👥 {totalVotes.toString()} kişi
-          </div>
-        </div>
-      </div>
-
-      {/* Anlık Oy Durumu */}
-      <div style={{ marginBottom: '20px' }}>
-        <h5 style={{ margin: '0 0 10px 0', color: '#495057' }}>📈 Anlık Oy Durumu</h5>
-        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-          <div style={{ 
-            padding: '15px', 
-            backgroundColor: '#d4edda', 
-            borderRadius: '8px', 
-            textAlign: 'center',
-            border: '1px solid #c3e6cb'
-          }}>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#155724' }}>
-              ✅ {yesVotes.toString()}
+        setLoading(true);
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+            
+            const validOptions = options.filter(opt => opt.trim());
+            const tx = await contract.createVoting(proposal.trim(), validOptions, duration);
+            await tx.wait();
+            
+            alert('Oylama başarıyla oluşturuldu!');
+            setProposal('');
+            setOptions(['', '']);
+            await loadData();
+        } catch (error) {
+            console.error('Error creating voting:', error);
+            alert('Oylama oluşturulurken hata: ' + error.message);
+        }
+        setLoading(false);
+    };
+    
+    // Start voting
+    const startVoting = async (votingId) => {
+        setLoading(true);
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+            
+            const tx = await contract.startVoting(votingId);
+            await tx.wait();
+            
+            alert('Oylama başlatıldı!');
+            await loadData();
+        } catch (error) {
+            console.error('Error starting voting:', error);
+            alert('Oylama başlatılırken hata: ' + error.message);
+        }
+        setLoading(false);
+    };
+    
+    // End voting
+    const endVoting = async (votingId) => {
+        setLoading(true);
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+            
+            // Önce süre kontrolü yap
+            const timeRemaining = await contract.getTimeRemaining(votingId);
+            
+            if (Number(timeRemaining) > 0) {
+                const confirmEnd = confirm(
+                    `Oylama süresi henüz dolmadı (${Math.floor(Number(timeRemaining) / 3600)} saat ${Math.floor((Number(timeRemaining) % 3600) / 60)} dakika kaldı). ` +
+                    'Yine de oylamayı zorla bitirmek istiyor musunuz?'
+                );
+                
+                if (!confirmEnd) {
+                    setLoading(false);
+                    return;
+                }
+            }
+            
+            const tx = await contract.endVoting(votingId);
+            await tx.wait();
+            
+            alert('Oylama bitirildi!');
+            await loadData();
+        } catch (error) {
+            console.error('Error ending voting:', error);
+            
+            // Hata mesajını daha anlaşılır hale getir
+            let errorMessage = error.message;
+            if (errorMessage.includes('Voting period not ended')) {
+                errorMessage = 'Bu oylama henüz süre dolmadan bitirilemez. Lütfen sürenin dolmasını bekleyin veya contract sahibi ile iletişime geçin.';
+            } else if (errorMessage.includes('Oylama zaten bitmis')) {
+                errorMessage = 'Bu oylama zaten bitmiş durumda.';
+            }
+            
+            alert('Oylama bitirilirken hata: ' + errorMessage);
+        }
+        setLoading(false);
+    };
+    
+    // Reveal results
+    const revealResults = async (votingId) => {
+        setLoading(true);
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+            
+            const tx = await contract.revealResults(votingId);
+            await tx.wait();
+            
+            alert('Sonuçlar açıklandı!');
+            await loadData();
+        } catch (error) {
+            console.error('Error revealing results:', error);
+            alert('Sonuçlar açıklanırken hata: ' + error.message);
+        }
+        setLoading(false);
+    };
+    
+    // Authorize voter
+    const authorizeVoter = async () => {
+        if (!voterAddress.trim()) {
+            alert('Lütfen geçerli bir adres girin!');
+            return;
+        }
+        
+        setLoading(true);
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+            
+            const tx = await contract.authorizeVoter(voterAddress.trim());
+            await tx.wait();
+            
+            alert('Oy verme yetkisi verildi!');
+            setVoterAddress('');
+        } catch (error) {
+            console.error('Error authorizing voter:', error);
+            alert('Yetki verirken hata: ' + error.message);
+        }
+        setLoading(false);
+    };
+    
+    // Delete voting
+    const deleteVoting = async (votingId) => {
+        const confirmDelete = confirm(
+            'Bu oylamayı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!'
+        );
+        
+        if (!confirmDelete) return;
+        
+        setLoading(true);
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+            
+            const tx = await contract.deleteVoting(votingId);
+            await tx.wait();
+            
+            alert('Oylama başarıyla silindi!');
+            await loadData();
+        } catch (error) {
+            console.error('Error deleting voting:', error);
+            alert('Oylama silinirken hata: ' + error.message);
+        }
+        setLoading(false);
+    };
+    
+    // Add option
+    const addOption = () => {
+        if (options.length < 10) {
+            setOptions([...options, '']);
+        }
+    };
+    
+    // Remove option
+    const removeOption = (index) => {
+        if (options.length > 2) {
+            setOptions(options.filter((_, i) => i !== index));
+        }
+    };
+    
+    // Format time remaining
+    const formatTimeRemaining = (seconds) => {
+        if (seconds <= 0) return 'Süresi doldu';
+        
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        
+        if (hours > 0) {
+            return `${hours} saat ${minutes} dakika`;
+        }
+        return `${minutes} dakika`;
+    };
+    
+    useEffect(() => {
+        if (account && isOwner) {
+            loadData();
+            const interval = setInterval(loadData, 30000);
+            return () => clearInterval(interval);
+        }
+    }, [account, isOwner]);
+    
+    if (!account) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+                <div className="max-w-md mx-auto bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-gray-800 text-center">
+                    <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-4">Admin Panel</h2>
+                    <p className="text-gray-400 mb-6">Yönetim paneline erişmek için cüzdanınızı bağlayın</p>
+                    <button
+                        onClick={connectWallet}
+                        className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 text-white py-3 px-6 rounded-xl hover:from-purple-700 hover:to-cyan-700 transition-all duration-300 font-medium"
+                    >
+                        MetaMask ile Bağlan
+                    </button>
+                </div>
             </div>
-            <div style={{ fontSize: '14px', color: '#155724' }}>Evet Oyları</div>
-          </div>
-          
-          <div style={{ 
-            padding: '15px', 
-            backgroundColor: '#f8d7da', 
-            borderRadius: '8px', 
-            textAlign: 'center',
-            border: '1px solid #f5c6cb'
-          }}>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#721c24' }}>
-              ❌ {noVotes.toString()}
+        );
+    }
+    
+    if (!isOwner) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+                <div className="max-w-md mx-auto bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-gray-800 text-center">
+                    <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-4">Erişim Reddedildi</h2>
+                    <p className="text-gray-400 mb-6">Bu sayfaya sadece contract owner'ı erişebilir.</p>
+                    <a 
+                        href="/"
+                        className="inline-block bg-gradient-to-r from-purple-600 to-cyan-600 text-white py-3 px-6 rounded-xl hover:from-purple-700 hover:to-cyan-700 transition-all duration-300 font-medium"
+                    >
+                        Ana Sayfaya Dön
+                    </a>
+                </div>
             </div>
-            <div style={{ fontSize: '14px', color: '#721c24' }}>Hayır Oyları</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Final Sonuçlar (eğer açıklandıysa) */}
-      {resultsRevealed && (
-        <div style={{ marginBottom: '20px' }}>
-          <h5 style={{ margin: '0 0 10px 0', color: '#495057' }}>🏆 Final Sonuçları</h5>
-          <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-            <div style={{ 
-              padding: '15px', 
-              backgroundColor: '#d1ecf1', 
-              borderRadius: '8px', 
-              textAlign: 'center',
-              border: '1px solid #bee5eb'
-            }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#0c5460' }}>
-                ✅ {finalYesVotes.toString()}
-              </div>
-              <div style={{ fontSize: '14px', color: '#0c5460' }}>Final Evet</div>
+        );
+    }
+    
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+            {/* Animated Background */}
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -inset-10 opacity-30">
+                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+                    <div className="absolute top-3/4 right-1/4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
+                    <div className="absolute bottom-1/4 left-1/2 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-2000"></div>
+                </div>
             </div>
             
-            <div style={{ 
-              padding: '15px', 
-              backgroundColor: '#f8d7da', 
-              borderRadius: '8px', 
-              textAlign: 'center',
-              border: '1px solid #f5c6cb'
-            }}>
-              <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#721c24' }}>
-                ❌ {finalNoVotes.toString()}
-              </div>
-              <div style={{ fontSize: '14px', color: '#721c24' }}>Final Hayır</div>
+            <div className="relative z-10">
+                {/* Header */}
+                <header className="border-b border-gray-800 bg-black/20 backdrop-blur-xl">
+                    <div className="container mx-auto px-6 py-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-4">
+                                <div className="w-10 h-10 flex items-center justify-center">
+                                    <img src="/logo.svg" alt="ZamaVote Logo" className="w-10 h-10" />
+                                </div>
+                                <div>
+                                    <h1 className="text-2xl font-bold text-white">ZamaVote Admin</h1>
+                                    <p className="text-gray-400 text-sm">Gelişmiş Yönetim Paneli</p>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center space-x-4">
+                                <div className="text-right">
+                                    <p className="text-sm text-gray-400">Admin</p>
+                                    <p className="font-mono text-white text-sm">{account.slice(0, 6)}...{account.slice(-4)}</p>
+                                </div>
+                                <a 
+                                    href="/"
+                                    className="bg-white/10 text-white px-4 py-2 rounded-xl hover:bg-white/20 transition-colors"
+                                >
+                                    Ana Sayfa
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                
+                <div className="container mx-auto px-6 py-8">
+                    <div className="flex gap-8">
+                        {/* Sidebar */}
+                        <div className="w-64 space-y-2">
+                            <nav className="bg-white/5 backdrop-blur-xl rounded-2xl p-4 border border-gray-800">
+                                <div className="space-y-2">
+                                    <button
+                                        onClick={() => setActiveSection('dashboard')}
+                                        className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
+                                            activeSection === 'dashboard'
+                                                ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white'
+                                                : 'text-gray-400 hover:text-white hover:bg-white/10'
+                                        }`}
+                                    >
+                                        <div className="flex items-center space-x-3">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                            </svg>
+                                            <span>Dashboard</span>
+                                        </div>
+                                    </button>
+                                    
+                                    <button
+                                        onClick={() => setActiveSection('create')}
+                                        className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
+                                            activeSection === 'create'
+                                                ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white'
+                                                : 'text-gray-400 hover:text-white hover:bg-white/10'
+                                        }`}
+                                    >
+                                        <div className="flex items-center space-x-3">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                            </svg>
+                                            <span>Oylama Oluştur</span>
+                                        </div>
+                                    </button>
+                                    
+                                    <button
+                                        onClick={() => setActiveSection('manage')}
+                                        className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
+                                            activeSection === 'manage'
+                                                ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white'
+                                                : 'text-gray-400 hover:text-white hover:bg-white/10'
+                                        }`}
+                                    >
+                                        <div className="flex items-center space-x-3">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                            </svg>
+                                            <span>Oylamaları Yönet</span>
+                                        </div>
+                                    </button>
+                                    
+                                    <button
+                                        onClick={() => setActiveSection('voters')}
+                                        className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
+                                            activeSection === 'voters'
+                                                ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white'
+                                                : 'text-gray-400 hover:text-white hover:bg-white/10'
+                                        }`}
+                                    >
+                                        <div className="flex items-center space-x-3">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            <span>Oy Veren Yönetimi</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </nav>
+                        </div>
+                        
+                        {/* Main Content */}
+                        <div className="flex-1">
+                            {/* Dashboard */}
+                            {activeSection === 'dashboard' && (
+                                <div className="space-y-8">
+                                    <div>
+                                        <h2 className="text-3xl font-bold text-white mb-2">Dashboard</h2>
+                                        <p className="text-gray-400">Sistem genel durumu ve istatistikler</p>
+                                    </div>
+                                    
+                                    {/* Stats Cards */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-gray-800">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-gray-400 text-sm">Toplam Oylama</p>
+                                                    <p className="text-3xl font-bold text-white">{stats.totalVotings}</p>
+                                                </div>
+                                                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-gray-800">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-gray-400 text-sm">Aktif Oylama</p>
+                                                    <p className="text-3xl font-bold text-white">{stats.activeVotings}</p>
+                                                </div>
+                                                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-gray-800">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-gray-400 text-sm">Toplam Oy</p>
+                                                    <p className="text-3xl font-bold text-white">{stats.totalVotes}</p>
+                                                </div>
+                                                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-gray-800">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-gray-400 text-sm">Tamamlanan</p>
+                                                    <p className="text-3xl font-bold text-white">{stats.completedVotings}</p>
+                                                </div>
+                                                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
+                                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Recent Votings */}
+                                    <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-gray-800">
+                                        <h3 className="text-xl font-bold text-white mb-6">Son Oylamalar</h3>
+                                        <div className="space-y-4">
+                                            {votings.slice(0, 5).map((voting) => (
+                                                <div key={voting.id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-gray-700">
+                                                    <div>
+                                                        <h4 className="font-medium text-white">{voting.proposal}</h4>
+                                                        <p className="text-sm text-gray-400">
+                                                            {voting.totalVoters} oy • {voting.active ? 'Aktif' : voting.resultsRevealed ? 'Tamamlandı' : 'Beklemede'}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                        {voting.active && (
+                                                            <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs">Aktif</span>
+                                                        )}
+                                                        {voting.resultsRevealed && (
+                                                            <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs">Tamamlandı</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Create Voting */}
+                            {activeSection === 'create' && (
+                                <div className="space-y-8">
+                                    <div>
+                                        <h2 className="text-3xl font-bold text-white mb-2">Yeni Oylama Oluştur</h2>
+                                        <p className="text-gray-400">Detaylı oylama parametreleri ile yeni oylama oluşturun</p>
+                                    </div>
+                                    
+                                    <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-gray-800">
+                                        <div className="space-y-6">
+                                            {/* Proposal */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-300 mb-3">
+                                                    Oylama Başlığı *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={proposal}
+                                                    onChange={(e) => setProposal(e.target.value)}
+                                                    placeholder="Örn: Blockchain teknolojisi gelecekte yaygınlaşacak mı?"
+                                                    className="w-full p-4 bg-white/5 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                                                />
+                                            </div>
+                                            
+                                            {/* Options */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-300 mb-3">
+                                                    Seçenekler *
+                                                </label>
+                                                <div className="space-y-3">
+                                                    {options.map((option, index) => (
+                                                        <div key={index} className="flex items-center space-x-3">
+                                                            <div className="flex-1 relative">
+                                                                <input
+                                                                    type="text"
+                                                                    value={option}
+                                                                    onChange={(e) => {
+                                                                        const newOptions = [...options];
+                                                                        newOptions[index] = e.target.value;
+                                                                        setOptions(newOptions);
+                                                                    }}
+                                                                    placeholder={`Seçenek ${index + 1}`}
+                                                                    className="w-full p-4 pl-12 bg-white/5 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                                                                />
+                                                                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                                                    {index + 1}
+                                                                </div>
+                                                            </div>
+                                                            {options.length > 2 && (
+                                                                <button
+                                                                    onClick={() => removeOption(index)}
+                                                                    className="text-red-400 hover:text-red-300 p-2 transition-colors"
+                                                                >
+                                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                    </svg>
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                {options.length < 10 && (
+                                                    <button
+                                                        onClick={addOption}
+                                                        className="mt-3 text-purple-400 hover:text-purple-300 text-sm font-medium flex items-center space-x-1 transition-colors"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                        </svg>
+                                                        <span>Seçenek Ekle</span>
+                                                    </button>
+                                                )}
+                                            </div>
+                                            
+                                            {/* Duration */}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-300 mb-3">
+                                                    Oylama Süresi (Saat) *
+                                                </label>
+                                                <div className="grid grid-cols-4 gap-3">
+                                                    {[1, 6, 12, 24, 48, 72, 168].map((hours) => (
+                                                        <button
+                                                            key={hours}
+                                                            onClick={() => setDuration(hours)}
+                                                            className={`p-3 rounded-xl border transition-all duration-300 ${
+                                                                duration === hours
+                                                                    ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white border-transparent'
+                                                                    : 'bg-white/5 text-gray-300 border-gray-700 hover:border-gray-600'
+                                                            }`}
+                                                        >
+                                                            {hours < 24 ? `${hours}s` : `${hours / 24}g`}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                <input
+                                                    type="number"
+                                                    value={duration}
+                                                    onChange={(e) => setDuration(Number(e.target.value))}
+                                                    min="1"
+                                                    max="168"
+                                                    className="mt-3 w-full p-4 bg-white/5 border border-gray-700 rounded-xl text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                                                    placeholder="Özel süre (saat)"
+                                                />
+                                            </div>
+                                            
+                                            {/* Create Button */}
+                                            <button
+                                                onClick={createVoting}
+                                                disabled={loading}
+                                                className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 text-white py-4 px-6 rounded-xl hover:from-purple-700 hover:to-cyan-700 disabled:opacity-50 font-medium text-lg transition-all duration-300 transform hover:scale-105"
+                                            >
+                                                {loading ? (
+                                                    <div className="flex items-center justify-center space-x-2">
+                                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                        <span>Oluşturuluyor...</span>
+                                                    </div>
+                                                ) : (
+                                                    'Oylama Oluştur'
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Manage Votings */}
+                            {activeSection === 'manage' && (
+                                <div className="space-y-8">
+                                    <div>
+                                        <h2 className="text-3xl font-bold text-white mb-2">Oylamaları Yönet</h2>
+                                        <p className="text-gray-400">Mevcut oylamaları başlatın, durdurun ve sonuçları açıklayın</p>
+                                    </div>
+                                    
+                                    <div className="space-y-6">
+                                        {votings.map((voting) => (
+                                            <div key={voting.id} className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-gray-800">
+                                                <div className="flex justify-between items-start mb-6">
+                                                    <div className="flex-1">
+                                                        <h3 className="text-xl font-bold text-white mb-2">{voting.proposal}</h3>
+                                                        <div className="flex items-center space-x-4 text-sm text-gray-400 mb-4">
+                                                            <span>ID: {voting.id}</span>
+                                                            <span>Oy: {voting.totalVoters}</span>
+                                                            <span>Oluşturulma: {voting.createdAt.toLocaleDateString('tr-TR')}</span>
+                                                            {voting.active && (
+                                                                <span className="text-green-400">
+                                                                    Kalan: {formatTimeRemaining(voting.timeRemaining)}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        
+                                                        {/* Options with Results */}
+                                                        <div className="space-y-3 mb-6">
+                                                            {voting.options.map((option, index) => (
+                                                                <div key={index} className="bg-white/5 rounded-xl p-4 border border-gray-700">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className="font-medium text-white">{option}</span>
+                                                                        
+                                                                        {voting.resultsRevealed ? (
+                                                                            <div className="flex items-center space-x-4">
+                                                                                <span className="text-gray-300 font-medium">
+                                                                                    {voting.finalVotes[index]} oy
+                                                                                </span>
+                                                                                <div className="w-32 bg-gray-700 rounded-full h-3">
+                                                                                    <div
+                                                                                        className="bg-gradient-to-r from-purple-500 to-cyan-500 h-3 rounded-full transition-all duration-500"
+                                                                                        style={{
+                                                                                            width: `${voting.totalVoters > 0 
+                                                                                                ? (voting.finalVotes[index] / voting.totalVoters) * 100 
+                                                                                                : 0}%`
+                                                                                        }}
+                                                                                    ></div>
+                                                                                </div>
+                                                                                <span className="text-gray-400 text-sm min-w-[3rem]">
+                                                                                    {voting.totalVoters > 0 
+                                                                                        ? Math.round((voting.finalVotes[index] / voting.totalVoters) * 100)
+                                                                                        : 0}%
+                                                                                </span>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <span className="text-gray-500 text-sm">
+                                                                                Sonuçlar henüz açıklanmadı
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="flex flex-col space-y-2 ml-6">
+                                                        {voting.active && (
+                                                            <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm">Aktif</span>
+                                                        )}
+                                                        {voting.resultsRevealed && (
+                                                            <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">Tamamlandı</span>
+                                                        )}
+                                                        {!voting.active && !voting.resultsRevealed && (
+                                                            <span className="bg-gray-500 text-white px-3 py-1 rounded-full text-sm">Beklemede</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* Action Buttons */}
+                                                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {!voting.active && !voting.resultsRevealed && (
+                                                            <button
+                                                                onClick={() => startVoting(voting.id)}
+                                                                disabled={loading}
+                                                                className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 rounded-lg hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 font-medium transition-all duration-300 text-sm"
+                                                            >
+                                                                🚀 Başlat
+                                                            </button>
+                                                        )}
+                                                        
+                                                        {voting.active && (
+                                                            <button
+                                                                onClick={() => endVoting(voting.id)}
+                                                                disabled={loading}
+                                                                className="bg-gradient-to-r from-orange-600 to-red-600 text-white px-4 py-2 rounded-lg hover:from-orange-700 hover:to-red-700 disabled:opacity-50 font-medium transition-all duration-300 text-sm"
+                                                            >
+                                                                ⏹️ Bitir
+                                                            </button>
+                                                        )}
+                                                        
+                                                        {!voting.active && !voting.resultsRevealed && (
+                                                            <button
+                                                                onClick={() => revealResults(voting.id)}
+                                                                disabled={loading}
+                                                                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 font-medium transition-all duration-300 text-sm"
+                                                            >
+                                                                📊 Sonuçlar
+                                                            </button>
+                                                        )}
+                                                        
+                                                        {voting.resultsRevealed && (
+                                                            <div className="flex items-center space-x-2 text-green-400 text-sm">
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                <span className="font-medium">Tamamlandı</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    {/* Delete Button - Always visible */}
+                                                    <button
+                                                        onClick={() => deleteVoting(voting.id)}
+                                                        disabled={loading}
+                                                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 font-medium transition-all duration-300 text-sm border border-red-500 flex items-center gap-1"
+                                                        title="Bu oylamayı kalıcı olarak sil"
+                                                    >
+                                                        🗑️ Sil
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Voter Management */}
+                            {activeSection === 'voters' && (
+                                <div className="space-y-8">
+                                    <div>
+                                        <h2 className="text-3xl font-bold text-white mb-2">Oy Veren Yönetimi</h2>
+                                        <p className="text-gray-400">Kullanıcılara oy verme yetkisi verin veya kaldırın</p>
+                                    </div>
+                                    
+                                    <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-gray-800">
+                                        <h3 className="text-xl font-bold text-white mb-6">Yetki Ver</h3>
+                                        <div className="flex space-x-4">
+                                            <input
+                                                type="text"
+                                                value={voterAddress}
+                                                onChange={(e) => setVoterAddress(e.target.value)}
+                                                placeholder="0x... (Ethereum adresi)"
+                                                className="flex-1 p-4 bg-white/5 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                                            />
+                                            <button
+                                                onClick={authorizeVoter}
+                                                disabled={loading}
+                                                className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-8 py-4 rounded-xl hover:from-purple-700 hover:to-cyan-700 disabled:opacity-50 font-medium transition-all duration-300"
+                                            >
+                                                Yetki Ver
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div style={{ 
-              padding: '15px', 
-              backgroundColor: '#fff3cd', 
-              borderRadius: '8px', 
-              textAlign: 'center',
-              border: '1px solid #ffeaa7'
-            }}>
-              <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#856404' }}>
-                🏆 {Number(finalYesVotes) > Number(finalNoVotes) ? 'EVET' : 
-                     Number(finalNoVotes) > Number(finalYesVotes) ? 'HAYIR' : 'BERABERE'}
-              </div>
-              <div style={{ fontSize: '14px', color: '#856404' }}>Kazanan</div>
-            </div>
-          </div>
         </div>
-      )}
-
-      {/* Oy Veren Adresler */}
-      {voters && voters.length > 0 && (
-        <div>
-          <h5 style={{ margin: '0 0 10px 0', color: '#495057' }}>
-            👥 Oy Veren Adresler ({voters.length} kişi)
-          </h5>
-          <div style={{ 
-            maxHeight: '200px', 
-            overflowY: 'auto', 
-            backgroundColor: 'white', 
-            border: '1px solid #dee2e6',
-            borderRadius: '4px',
-            padding: '10px'
-          }}>
-            {voters.map((voter, index) => (
-              <div 
-                key={voter}
-                style={{ 
-                  padding: '8px', 
-                  borderBottom: index < voters.length - 1 ? '1px solid #f8f9fa' : 'none',
-                  fontSize: '12px',
-                  fontFamily: 'monospace'
-                }}
-              >
-                <span style={{ color: '#6c757d', marginRight: '10px' }}>
-                  {index + 1}.
-                </span>
-                <span style={{ color: '#495057' }}>
-                  {voter}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+    );
 }

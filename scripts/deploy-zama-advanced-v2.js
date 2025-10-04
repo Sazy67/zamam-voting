@@ -6,10 +6,15 @@ async function main() {
     // Deployer hesabını al
     const [deployer] = await ethers.getSigners();
     console.log("📝 Deployer adresi:", deployer.address);
+    console.log("👑 Expected owner:", "0x8c82BaEe92C489270C89a88DF45de7F6bd864bA5");
     
     // Bakiye kontrolü
     const balance = await deployer.provider.getBalance(deployer.address);
-    console.log("💰 Deployer bakiyesi:", ethers.formatEther(balance), "ETH");
+    console.log("💰 Deployer bakiyesi:", ethers.formatEther(balance), "ZAMA");
+    
+    // Network kontrolü
+    const network = await deployer.provider.getNetwork();
+    console.log("🌐 Network:", network.name, "Chain ID:", network.chainId.toString());
     
     try {
         // Contract'ı deploy et
