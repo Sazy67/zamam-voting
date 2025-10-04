@@ -22,7 +22,33 @@ const translations = {
     activeVotings: "Aktif Oylamalar",
     votingsFound: "oylama bulundu",
     noVotings: "Henüz oylama bulunmuyor",
-    noVotingsDesc: "Yeni oylamalar oluşturulduğunda burada görünecek."
+    noVotingsDesc: "Yeni oylamalar oluşturulduğunda burada görünecek.",
+    // Voting status
+    active: "Aktif",
+    resultsRevealed: "Sonuçlar Açık",
+    hasVoted: "Oy Verildi",
+    votes: "oy",
+    voteButton: "Oy Ver",
+    // Admin panel
+    adminPanel: "Yönetim Paneli",
+    adminDesc: "Yeni oylamalar oluşturun ve mevcut oylamaları yönetin",
+    createVoting: "Yeni Oylama Oluştur",
+    votingTitle: "Oylama Başlığı",
+    duration: "Süre (Saat)",
+    createButton: "Oylama Oluştur",
+    // Alerts
+    votingCreated: "Oylama başarıyla oluşturuldu!",
+    votingStarted: "Oylama başlatıldı!",
+    voteRecorded: "Oyunuz başarıyla kaydedildi!",
+    votingEnded: "Oylama bitirildi!",
+    resultsRevealed: "Sonuçlar açıklandı!",
+    fillAllFields: "Lütfen tüm alanları doldurun!",
+    createError: "Oylama oluşturulurken hata: ",
+    startError: "Oylama başlatılırken hata: ",
+    voteError: "Oy verirken hata: ",
+    endError: "Oylama bitirilirken hata: ",
+    revealError: "Sonuçlar açıklanırken hata: ",
+    metamaskNotFound: "MetaMask bulunamadı! Lütfen MetaMask yükleyin."
   },
   en: {
     title: "ZamaVote",
@@ -43,7 +69,33 @@ const translations = {
     activeVotings: "Active Votings",
     votingsFound: "votings found",
     noVotings: "No votings yet",
-    noVotingsDesc: "New votings will appear here when created."
+    noVotingsDesc: "New votings will appear here when created.",
+    // Voting status
+    active: "Active",
+    resultsRevealed: "Results Revealed",
+    hasVoted: "Voted",
+    votes: "votes",
+    voteButton: "Vote",
+    // Admin panel
+    adminPanel: "Management Panel",
+    adminDesc: "Create new votings and manage existing ones",
+    createVoting: "Create New Voting",
+    votingTitle: "Voting Title",
+    duration: "Duration (Hours)",
+    createButton: "Create Voting",
+    // Alerts
+    votingCreated: "Voting created successfully!",
+    votingStarted: "Voting started!",
+    voteRecorded: "Your vote has been recorded successfully!",
+    votingEnded: "Voting ended!",
+    resultsRevealed: "Results revealed!",
+    fillAllFields: "Please fill all fields!",
+    createError: "Error creating voting: ",
+    startError: "Error starting voting: ",
+    voteError: "Error casting vote: ",
+    endError: "Error ending voting: ",
+    revealError: "Error revealing results: ",
+    metamaskNotFound: "MetaMask not found! Please install MetaMask."
   }
 };
 
@@ -98,7 +150,7 @@ export default function Home() {
         console.error('Wallet connection failed:', error);
       }
     } else {
-      alert('MetaMask bulunamadı! Lütfen MetaMask yükleyin.');
+      alert(translations[language].metamaskNotFound);
     }
   };
 
@@ -149,7 +201,7 @@ export default function Home() {
   // Create voting
   const createVoting = async () => {
     if (!proposal.trim() || options.some(opt => !opt.trim())) {
-      alert('Lütfen tüm alanları doldurun!');
+      alert(translations[language].fillAllFields);
       return;
     }
 
@@ -163,13 +215,13 @@ export default function Home() {
       const tx = await contract.createVoting(proposal.trim(), validOptions, duration);
       await tx.wait();
 
-      alert('Oylama başarıyla oluşturuldu!');
+      alert(translations[language].votingCreated);
       setProposal('');
       setOptions(['', '']);
       await loadVotings();
     } catch (error) {
       console.error('Error creating voting:', error);
-      alert('Oylama oluşturulurken hata: ' + error.message);
+      alert(translations[language].createError + error.message);
     }
     setLoading(false);
   };
@@ -185,11 +237,11 @@ export default function Home() {
       const tx = await contract.startVoting(votingId);
       await tx.wait();
 
-      alert('Oylama başlatıldı!');
+      alert(translations[language].votingStarted);
       await loadVotings();
     } catch (error) {
       console.error('Error starting voting:', error);
-      alert('Oylama başlatılırken hata: ' + error.message);
+      alert(translations[language].startError + error.message);
     }
     setLoading(false);
   };
@@ -205,11 +257,11 @@ export default function Home() {
       const tx = await contract.vote(votingId, optionIndex);
       await tx.wait();
 
-      alert('Oyunuz başarıyla kaydedildi!');
+      alert(translations[language].voteRecorded);
       await loadVotings();
     } catch (error) {
       console.error('Error casting vote:', error);
-      alert('Oy verirken hata: ' + error.message);
+      alert(translations[language].voteError + error.message);
     }
     setLoading(false);
   };
@@ -225,11 +277,11 @@ export default function Home() {
       const tx = await contract.endVoting(votingId);
       await tx.wait();
 
-      alert('Oylama bitirildi!');
+      alert(translations[language].votingEnded);
       await loadVotings();
     } catch (error) {
       console.error('Error ending voting:', error);
-      alert('Oylama bitirilirken hata: ' + error.message);
+      alert(translations[language].endError + error.message);
     }
     setLoading(false);
   };
@@ -245,11 +297,11 @@ export default function Home() {
       const tx = await contract.revealResults(votingId);
       await tx.wait();
 
-      alert('Sonuçlar açıklandı!');
+      alert(translations[language].resultsRevealed);
       await loadVotings();
     } catch (error) {
       console.error('Error revealing results:', error);
-      alert('Sonuçlar açıklanırken hata: ' + error.message);
+      alert(translations[language].revealError + error.message);
     }
     setLoading(false);
   };
@@ -270,15 +322,19 @@ export default function Home() {
 
   // Format time remaining
   const formatTimeRemaining = (seconds) => {
-    if (seconds <= 0) return 'Süresi doldu';
+    if (seconds <= 0) return language === 'tr' ? 'Süresi doldu' : 'Time expired';
 
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
 
     if (hours > 0) {
-      return `${hours} saat ${minutes} dakika`;
+      return language === 'tr' 
+        ? `${hours} saat ${minutes} dakika`
+        : `${hours} hours ${minutes} minutes`;
     }
-    return `${minutes} dakika`;
+    return language === 'tr' 
+      ? `${minutes} dakika`
+      : `${minutes} minutes`;
   };
 
   useEffect(() => {
@@ -534,7 +590,7 @@ export default function Home() {
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                   </svg>
-                                  <span>{voting.totalVoters} oy</span>
+                                  <span>{voting.totalVoters} {translations[language].votes}</span>
                                 </span>
                                 {voting.active && (
                                   <span className="flex items-center space-x-1 text-green-400">
@@ -549,17 +605,17 @@ export default function Home() {
                             <div className="flex flex-col space-y-2">
                               {voting.active && (
                                 <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-xl text-sm font-medium">
-                                  Aktif
+                                  {translations[language].active}
                                 </span>
                               )}
                               {voting.resultsRevealed && (
                                 <span className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-2 rounded-xl text-sm font-medium">
-                                  Sonuçlar Açık
+                                  {translations[language].resultsRevealed}
                                 </span>
                               )}
                               {voting.hasVoted && (
                                 <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-xl text-sm font-medium">
-                                  Oy Verildi
+                                  {translations[language].hasVoted}
                                 </span>
                               )}
                             </div>
@@ -575,7 +631,7 @@ export default function Home() {
                                   {voting.resultsRevealed ? (
                                     <div className="flex items-center space-x-4">
                                       <span className="text-gray-300 font-medium">
-                                        {voting.finalVotes[index]} oy
+                                        {voting.finalVotes[index]} {translations[language].votes}
                                       </span>
                                       <div className="w-32 bg-gray-700 rounded-full h-3">
                                         <div
@@ -599,7 +655,7 @@ export default function Home() {
                                       disabled={loading}
                                       className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-cyan-700 disabled:opacity-50 font-medium transition-all duration-300 transform hover:scale-105"
                                     >
-                                      Oy Ver
+                                      {translations[language].voteButton}
                                     </button>
                                   ) : null}
                                 </div>
@@ -652,18 +708,18 @@ export default function Home() {
               {activeTab === 'admin' && isOwner && (
                 <div className="space-y-8">
                   <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold text-white mb-2">Yönetim Paneli</h2>
-                    <p className="text-gray-400">Yeni oylamalar oluşturun ve mevcut oylamaları yönetin</p>
+                    <h2 className="text-3xl font-bold text-white mb-2">{translations[language].adminPanel}</h2>
+                    <p className="text-gray-400">{translations[language].adminDesc}</p>
                   </div>
 
                   <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-gray-800">
-                    <h3 className="text-2xl font-bold text-white mb-6">Yeni Oylama Oluştur</h3>
+                    <h3 className="text-2xl font-bold text-white mb-6">{translations[language].createVoting}</h3>
 
                     <div className="space-y-6">
                       {/* Proposal */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-3">
-                          Oylama Başlığı
+                          {translations[language].votingTitle}
                         </label>
                         <input
                           type="text"
@@ -722,7 +778,7 @@ export default function Home() {
                       {/* Duration */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-3">
-                          Süre (Saat)
+                          {translations[language].duration}
                         </label>
                         <input
                           type="number"
@@ -746,7 +802,7 @@ export default function Home() {
                             <span>Oluşturuluyor...</span>
                           </div>
                         ) : (
-                          'Oylama Oluştur'
+                          translations[language].createButton
                         )}
                       </button>
                     </div>

@@ -1,6 +1,134 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 
+// Language translations
+const translations = {
+  tr: {
+    // Navigation
+    dashboard: "Kontrol Paneli",
+    createVoting: "Oylama Oluştur",
+    manageVotings: "Oylamaları Yönet",
+    voterManagement: "Oy Veren Yönetimi",
+    
+    // Stats
+    totalVotings: "Toplam Oylama",
+    activeVotings: "Aktif Oylama",
+    totalVotes: "Toplam Oy",
+    completedVotings: "Tamamlanan Oylama",
+    
+    // Status
+    active: "Aktif",
+    completed: "Tamamlandı",
+    pending: "Beklemede",
+    voted: "Oy Verildi",
+    
+    // Time
+    hours: "saat",
+    minutes: "dakika",
+    timeExpired: "Süresi doldu",
+    remaining: "Kalan",
+    
+    // Forms
+    votingTitle: "Oylama Başlığı",
+    votingDuration: "Oylama Süresi (Saat)",
+    customDuration: "Özel süre (saat)",
+    
+    // Buttons
+    create: "Oluştur",
+    start: "Başlat",
+    end: "Bitir",
+    reveal: "Sonuçları Açıkla",
+    delete: "Sil",
+    authorize: "Yetki Ver",
+    
+    // Messages
+    votingCreated: "Oylama başarıyla oluşturuldu!",
+    votingStarted: "Oylama başlatıldı!",
+    votingEnded: "Oylama bitirildi!",
+    resultsRevealed: "Sonuçlar açıklandı!",
+    voterAuthorized: "Oy verme yetkisi verildi!",
+    votingDeleted: "Oylama başarıyla silindi!",
+    
+    // Errors
+    createError: "Oylama oluşturulurken hata: ",
+    startError: "Oylama başlatılırken hata: ",
+    endError: "Oylama bitirilirken hata: ",
+    revealError: "Sonuçlar açıklanırken hata: ",
+    deleteError: "Oylama silinirken hata: ",
+    
+    // Confirmations
+    confirmEnd: "Oylama süresi henüz dolmadı",
+    forceEnd: "Yine de oylamayı zorla bitirmek istiyor musunuz?",
+    confirmDelete: "Bu oylamayı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!",
+    
+    // Descriptions
+    adminDesc: "Detaylı oylama parametreleri ile yeni oylama oluşturun",
+    recentVotings: "Son Oylamalar"
+  },
+  en: {
+    // Navigation
+    dashboard: "Dashboard",
+    createVoting: "Create Voting",
+    manageVotings: "Manage Votings",
+    voterManagement: "Voter Management",
+    
+    // Stats
+    totalVotings: "Total Votings",
+    activeVotings: "Active Votings",
+    totalVotes: "Total Votes",
+    completedVotings: "Completed Votings",
+    
+    // Status
+    active: "Active",
+    completed: "Completed",
+    pending: "Pending",
+    voted: "Voted",
+    
+    // Time
+    hours: "hours",
+    minutes: "minutes",
+    timeExpired: "Time expired",
+    remaining: "Remaining",
+    
+    // Forms
+    votingTitle: "Voting Title",
+    votingDuration: "Voting Duration (Hours)",
+    customDuration: "Custom duration (hours)",
+    
+    // Buttons
+    create: "Create",
+    start: "Start",
+    end: "End",
+    reveal: "Reveal Results",
+    delete: "Delete",
+    authorize: "Authorize",
+    
+    // Messages
+    votingCreated: "Voting created successfully!",
+    votingStarted: "Voting started!",
+    votingEnded: "Voting ended!",
+    resultsRevealed: "Results revealed!",
+    voterAuthorized: "Voter authorization granted!",
+    votingDeleted: "Voting deleted successfully!",
+    
+    // Errors
+    createError: "Error creating voting: ",
+    startError: "Error starting voting: ",
+    endError: "Error ending voting: ",
+    revealError: "Error revealing results: ",
+    deleteError: "Error deleting voting: ",
+    
+    // Confirmations
+    confirmEnd: "Voting period has not ended yet",
+    forceEnd: "Do you still want to force end the voting?",
+    confirmDelete: "Are you sure you want to permanently delete this voting? This action cannot be undone!",
+    
+    // Descriptions
+    adminDesc: "Create new voting with detailed voting parameters",
+    recentVotings: "Recent Votings"
+  }
+};
+
 // Contract bilgileri
 const CONTRACT_ADDRESS = "0x9f2032a8Add12a036e3D529Ae1b21A0EDB9C63CB";
 const CONTRACT_ABI = [
@@ -28,6 +156,7 @@ export default function AdminPanel() {
     const [votings, setVotings] = useState([]);
     const [loading, setLoading] = useState(false);
     const [activeSection, setActiveSection] = useState('dashboard');
+    const [language, setLanguage] = useState('tr');
     
     // Form states
     const [proposal, setProposal] = useState('');
@@ -168,13 +297,13 @@ export default function AdminPanel() {
             const tx = await contract.createVoting(proposal.trim(), validOptions, duration);
             await tx.wait();
             
-            alert('Oylama başarıyla oluşturuldu!');
+            alert(translations[language].votingCreated);
             setProposal('');
             setOptions(['', '']);
             await loadData();
         } catch (error) {
             console.error('Error creating voting:', error);
-            alert('Oylama oluşturulurken hata: ' + error.message);
+            alert(translations[language].createError + error.message);
         }
         setLoading(false);
     };
@@ -190,11 +319,11 @@ export default function AdminPanel() {
             const tx = await contract.startVoting(votingId);
             await tx.wait();
             
-            alert('Oylama başlatıldı!');
+            alert(translations[language].votingStarted);
             await loadData();
         } catch (error) {
             console.error('Error starting voting:', error);
-            alert('Oylama başlatılırken hata: ' + error.message);
+            alert(translations[language].startError + error.message);
         }
         setLoading(false);
     };
@@ -212,8 +341,8 @@ export default function AdminPanel() {
             
             if (Number(timeRemaining) > 0) {
                 const confirmEnd = confirm(
-                    `Oylama süresi henüz dolmadı (${Math.floor(Number(timeRemaining) / 3600)} saat ${Math.floor((Number(timeRemaining) % 3600) / 60)} dakika kaldı). ` +
-                    'Yine de oylamayı zorla bitirmek istiyor musunuz?'
+                    `${translations[language].confirmEnd} (${Math.floor(Number(timeRemaining) / 3600)} ${translations[language].hours} ${Math.floor((Number(timeRemaining) % 3600) / 60)} ${translations[language].minutes} kaldı). ` +
+                    translations[language].forceEnd
                 );
                 
                 if (!confirmEnd) {
@@ -225,7 +354,7 @@ export default function AdminPanel() {
             const tx = await contract.endVoting(votingId);
             await tx.wait();
             
-            alert('Oylama bitirildi!');
+            alert(translations[language].votingEnded);
             await loadData();
         } catch (error) {
             console.error('Error ending voting:', error);
@@ -238,7 +367,7 @@ export default function AdminPanel() {
                 errorMessage = 'Bu oylama zaten bitmiş durumda.';
             }
             
-            alert('Oylama bitirilirken hata: ' + errorMessage);
+            alert(translations[language].endError + errorMessage);
         }
         setLoading(false);
     };
@@ -254,11 +383,11 @@ export default function AdminPanel() {
             const tx = await contract.revealResults(votingId);
             await tx.wait();
             
-            alert('Sonuçlar açıklandı!');
+            alert(translations[language].resultsRevealed);
             await loadData();
         } catch (error) {
             console.error('Error revealing results:', error);
-            alert('Sonuçlar açıklanırken hata: ' + error.message);
+            alert(translations[language].revealError + error.message);
         }
         setLoading(false);
     };
@@ -279,7 +408,7 @@ export default function AdminPanel() {
             const tx = await contract.authorizeVoter(voterAddress.trim());
             await tx.wait();
             
-            alert('Oy verme yetkisi verildi!');
+            alert(translations[language].voterAuthorized);
             setVoterAddress('');
         } catch (error) {
             console.error('Error authorizing voter:', error);
@@ -291,7 +420,7 @@ export default function AdminPanel() {
     // Delete voting
     const deleteVoting = async (votingId) => {
         const confirmDelete = confirm(
-            'Bu oylamayı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!'
+            translations[language].confirmDelete
         );
         
         if (!confirmDelete) return;
@@ -305,11 +434,11 @@ export default function AdminPanel() {
             const tx = await contract.deleteVoting(votingId);
             await tx.wait();
             
-            alert('Oylama başarıyla silindi!');
+            alert(translations[language].votingDeleted);
             await loadData();
         } catch (error) {
             console.error('Error deleting voting:', error);
-            alert('Oylama silinirken hata: ' + error.message);
+            alert(translations[language].deleteError + error.message);
         }
         setLoading(false);
     };
@@ -330,15 +459,15 @@ export default function AdminPanel() {
     
     // Format time remaining
     const formatTimeRemaining = (seconds) => {
-        if (seconds <= 0) return 'Süresi doldu';
+        if (seconds <= 0) return translations[language].timeExpired;
         
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         
         if (hours > 0) {
-            return `${hours} saat ${minutes} dakika`;
+            return `${hours} ${translations[language].hours} ${minutes} ${translations[language].minutes}`;
         }
-        return `${minutes} dakika`;
+        return `${minutes} ${translations[language].minutes}`;
     };
     
     useEffect(() => {
