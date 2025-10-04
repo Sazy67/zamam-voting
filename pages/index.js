@@ -148,6 +148,148 @@ export default function Home() {
                 <ConnectButton />
               </div>
 
+              {/* System Selection */}
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+                gap: '30px',
+                marginTop: '50px'
+              }}>
+                {/* Klasik Sistem */}
+                <div style={{ 
+                  padding: '30px 25px', 
+                  background: 'linear-gradient(135deg, #E3F2FD, #BBDEFB)',
+                  borderRadius: '20px', 
+                  border: '2px solid rgba(33, 150, 243, 0.3)',
+                  boxShadow: '0 15px 35px rgba(33, 150, 243, 0.2)',
+                  textAlign: 'center',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer'
+                }}
+                onClick={() => window.location.href = '/vote'}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(33, 150, 243, 0.3)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 15px 35px rgba(33, 150, 243, 0.2)';
+                }}
+                >
+                  <div style={{ fontSize: '64px', marginBottom: '20px' }}>🗳️</div>
+                  <h4 style={{ margin: '0 0 15px 0', color: '#1565C0', fontSize: '24px', fontWeight: '700' }}>
+                    Classic Voting
+                  </h4>
+                  <p style={{ fontSize: '16px', margin: '0 0 20px 0', color: '#666', lineHeight: '1.6' }}>
+                    Traditional blockchain voting with transparency. Simple and fast voting experience.
+                  </p>
+                  <div style={{
+                    padding: '12px 24px',
+                    background: 'linear-gradient(45deg, #2196F3, #1976D2)',
+                    color: 'white',
+                    borderRadius: '12px',
+                    fontWeight: '600',
+                    display: 'inline-block'
+                  }}>
+                    Start Voting →
+                  </div>
+                </div>
+                
+                {/* Zama Basit Sistem */}
+                <div style={{ 
+                  padding: '30px 25px', 
+                  background: 'linear-gradient(135deg, #FFF3E0, #FFE0B2)',
+                  borderRadius: '20px', 
+                  border: '2px solid rgba(255, 193, 7, 0.3)',
+                  boxShadow: '0 15px 35px rgba(255, 193, 7, 0.2)',
+                  textAlign: 'center',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer'
+                }}
+                onClick={() => window.location.href = '/zama-vote'}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(255, 193, 7, 0.3)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 15px 35px rgba(255, 193, 7, 0.2)';
+                }}
+                >
+                  <div style={{ fontSize: '64px', marginBottom: '20px' }}>🔐</div>
+                  <h4 style={{ margin: '0 0 15px 0', color: '#E65100', fontSize: '24px', fontWeight: '700' }}>
+                    Zama Encrypted
+                  </h4>
+                  <p style={{ fontSize: '16px', margin: '0 0 20px 0', color: '#666', lineHeight: '1.6' }}>
+                    Fully encrypted voting with Zama FHEVM. Complete privacy until results are revealed.
+                  </p>
+                  <div style={{
+                    padding: '12px 24px',
+                    background: 'linear-gradient(45deg, #FFC107, #FF8F00)',
+                    color: 'white',
+                    borderRadius: '12px',
+                    fontWeight: '600',
+                    display: 'inline-block'
+                  }}>
+                    Vote Privately →
+                  </div>
+                </div>
+                
+                {/* Zama Gelişmiş Sistem */}
+                <div style={{ 
+                  padding: '30px 25px', 
+                  background: 'linear-gradient(135deg, #F3E5F5, #E1BEE7)',
+                  borderRadius: '20px', 
+                  border: '2px solid rgba(156, 39, 176, 0.3)',
+                  boxShadow: '0 15px 35px rgba(156, 39, 176, 0.2)',
+                  textAlign: 'center',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                  position: 'relative'
+                }}
+                onClick={() => window.location.href = '/zama-advanced-vote'}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(156, 39, 176, 0.3)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 15px 35px rgba(156, 39, 176, 0.2)';
+                }}
+                >
+                  <div style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    background: 'linear-gradient(45deg, #FF6B6B, #FF8E53)',
+                    color: 'white',
+                    padding: '4px 8px',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                    fontWeight: '700'
+                  }}>
+                    NEW!
+                  </div>
+                  <div style={{ fontSize: '64px', marginBottom: '20px' }}>🚀</div>
+                  <h4 style={{ margin: '0 0 15px 0', color: '#7B1FA2', fontSize: '24px', fontWeight: '700' }}>
+                    Zama Advanced
+                  </h4>
+                  <p style={{ fontSize: '16px', margin: '0 0 20px 0', color: '#666', lineHeight: '1.6' }}>
+                    Multi-option encrypted voting with advanced features. Vote changing, access control, and more.
+                  </p>
+                  <div style={{
+                    padding: '12px 24px',
+                    background: 'linear-gradient(45deg, #9C27B0, #673AB7)',
+                    color: 'white',
+                    borderRadius: '12px',
+                    fontWeight: '600',
+                    display: 'inline-block'
+                  }}>
+                    Try Advanced →
+                  </div>
+                </div>
+              </div>
+              
               {/* Features Grid */}
               <div style={{ 
                 display: 'grid', 
@@ -178,12 +320,12 @@ export default function Home() {
                   border: '1px solid rgba(255, 193, 7, 0.3)',
                   boxShadow: '0 8px 25px rgba(255, 193, 7, 0.1)'
                 }}>
-                  <div style={{ fontSize: '48px', marginBottom: '15px' }}>⏰</div>
+                  <div style={{ fontSize: '48px', marginBottom: '15px' }}>⚡</div>
                   <h4 style={{ margin: '0 0 15px 0', color: '#F57F17', fontSize: '20px', fontWeight: '700' }}>
-                    Smart Time Management
+                    Multiple Options
                   </h4>
                   <p style={{ fontSize: '15px', margin: '0', color: '#666', lineHeight: '1.5' }}>
-                    Each voting has a specific duration. It automatically ends when time expires. Track with real-time countdown.
+                    Advanced system supports up to 10 options per voting. Create complex polls with multiple choices.
                   </p>
                 </div>
                 
@@ -194,69 +336,18 @@ export default function Home() {
                   border: '1px solid rgba(255, 193, 7, 0.3)',
                   boxShadow: '0 8px 25px rgba(255, 193, 7, 0.1)'
                 }}>
-                  <div style={{ fontSize: '48px', marginBottom: '15px' }}>🛡️</div>
+                  <div style={{ fontSize: '48px', marginBottom: '15px' }}>🔄</div>
                   <h4 style={{ margin: '0 0 15px 0', color: '#FF8F00', fontSize: '20px', fontWeight: '700' }}>
-                    Blockchain Security
+                    Vote Changing
                   </h4>
                   <p style={{ fontSize: '15px', margin: '0', color: '#666', lineHeight: '1.5' }}>
-                    Complete security with Ethereum-compatible smart contracts. Votes cannot be changed or manipulated.
+                    Change your vote anytime during the voting period. All changes are encrypted and secure.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Admin Panel Card */}
-            <div style={{ 
-              background: 'linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 235, 59, 0.1))',
-              borderRadius: '20px',
-              padding: '40px',
-              border: '2px solid rgba(255, 193, 7, 0.3)',
-              boxShadow: '0 15px 35px rgba(255, 193, 7, 0.1)'
-            }}>
-              <div style={{ fontSize: '56px', marginBottom: '20px' }}>👑</div>
-              <h3 style={{ 
-                fontSize: '28px', 
-                fontWeight: '700', 
-                margin: '0 0 15px 0',
-                color: '#E65100'
-              }}>
-                Admin Panel
-              </h3>
-              <p style={{ 
-                fontSize: '18px', 
-                color: '#666', 
-                marginBottom: '30px',
-                lineHeight: '1.6'
-              }}>
-                Access the admin panel to create, manage votings and reveal results
-              </p>
-              <a 
-                href="/zama-admin" 
-                style={{ 
-                  display: 'inline-block',
-                  padding: '16px 32px', 
-                  background: 'linear-gradient(45deg, #FFC107, #FF8F00)',
-                  color: 'white', 
-                  textDecoration: 'none', 
-                  borderRadius: '12px', 
-                  fontSize: '18px', 
-                  fontWeight: '700',
-                  boxShadow: '0 8px 25px rgba(255, 193, 7, 0.3)',
-                  transition: 'all 0.3s ease',
-                  border: 'none'
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 12px 35px rgba(255, 193, 7, 0.4)';
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = '0 8px 25px rgba(255, 193, 7, 0.3)';
-                }}
-              >
-                🔐 Go to Admin Panel
-              </a>
-            </div>
+
           </div>
         ) : (
           <div>
@@ -394,46 +485,7 @@ export default function Home() {
                     There are currently no active votings. New votings will appear here when created.
                   </p>
                   
-                  <div style={{ 
-                    padding: '30px', 
-                    background: 'linear-gradient(135deg, #FFF8E1, #FFECB3)',
-                    borderRadius: '16px', 
-                    border: '2px solid rgba(255, 193, 7, 0.3)',
-                    maxWidth: '400px',
-                    margin: '0 auto'
-                  }}>
-                    <div style={{ fontSize: '48px', marginBottom: '15px' }}>👑</div>
-                    <h4 style={{ color: '#E65100', marginBottom: '15px', fontSize: '20px', fontWeight: '700' }}>
-                      Are you an Admin?
-                    </h4>
-                    <p style={{ color: '#666', marginBottom: '20px', fontSize: '15px' }}>
-                      Go to admin panel to create new encrypted votings
-                    </p>
-                    <a 
-                      href="/zama-admin" 
-                      style={{ 
-                        display: 'inline-block',
-                        padding: '12px 24px', 
-                        background: 'linear-gradient(45deg, #FFC107, #FF8F00)',
-                        color: 'white', 
-                        textDecoration: 'none', 
-                        borderRadius: '10px', 
-                        fontWeight: '700',
-                        boxShadow: '0 6px 20px rgba(255, 193, 7, 0.3)',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseOver={(e) => {
-                        e.target.style.transform = 'translateY(-2px)';
-                        e.target.style.boxShadow = '0 8px 25px rgba(255, 193, 7, 0.4)';
-                      }}
-                      onMouseOut={(e) => {
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.boxShadow = '0 6px 20px rgba(255, 193, 7, 0.3)';
-                      }}
-                    >
-                      🔐 Admin Panel
-                    </a>
-                  </div>
+
                 </div>
               ) : (
                 <div style={{ display: 'grid', gap: '25px' }}>

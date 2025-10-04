@@ -34,6 +34,8 @@ contract MultiVotingSystem {
         _;
     }
     
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    
     modifier votingExists(uint256 votingId) {
         require(votingId < nextVotingId, "Oylama bulunamadi");
         _;
@@ -52,6 +54,25 @@ contract MultiVotingSystem {
     constructor() {
         owner = msg.sender;
         nextVotingId = 0;
+    }
+    
+    // Ownership transfer fonksiyonu
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(newOwner != address(0), "Yeni owner sifir adres olamaz");
+        require(newOwner != owner, "Yeni owner mevcut owner ile ayni olamaz");
+        
+        address previousOwner = owner;
+        owner = newOwner;
+        
+        emit OwnershipTransferred(previousOwner, newOwner);
+    }
+    
+    // Ownership'i renounce etme (güvenlik için)
+    function renounceOwnership() external onlyOwner {
+        address previousOwner = owner;
+        owner = address(0);
+        
+        emit OwnershipTransferred(previousOwner, address(0));
     }
     
     // Yeni oylama oluştur

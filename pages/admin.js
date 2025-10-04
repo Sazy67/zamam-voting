@@ -5,8 +5,16 @@ import multiContractArtifact from '../artifacts/contracts/MultiVotingSystem.sol/
 
 // Contract address from environment variable or fallback to local
 const getContractAddress = () => {
-  return process.env.NEXT_PUBLIC_MULTI_CONTRACT_ADDRESS || 
-         (typeof window !== 'undefined' ? null : '0x0D9ac45Cd4582ae467C2dB9c77f0B3B11B991413');
+  const envAddress = process.env.NEXT_PUBLIC_MULTI_CONTRACT_ADDRESS;
+  const fallbackAddress = '0xd571Ef424422BD0F843E8026d7Fa5808879B1B81';
+  
+  console.log('Contract Address Debug:', {
+    envAddress,
+    fallbackAddress,
+    finalAddress: envAddress || fallbackAddress
+  });
+  
+  return envAddress || fallbackAddress;
 };
 
 export default function AdminPage() {
@@ -67,6 +75,16 @@ export default function AdminPage() {
   });
 
   const isOwner = address && owner && address.toLowerCase() === owner.toLowerCase();
+  
+  // Debug bilgileri
+  console.log('Owner Check Debug:', {
+    address,
+    owner,
+    contractAddress,
+    isOwner,
+    addressLower: address?.toLowerCase(),
+    ownerLower: owner?.toLowerCase()
+  });
 
   if (!mounted) {
     return <div>Loading...</div>;
@@ -367,6 +385,8 @@ function VotingCard({ votingId, contractAddress, contractAbi }) {
     </div>
   );
 }
+
+
 
 // Voting Details Panel Component
 function VotingDetailsPanel({ votingId, votingDetails, voters, contractAddress, contractAbi }) {

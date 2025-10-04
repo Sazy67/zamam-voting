@@ -20,11 +20,12 @@ Modern blockchain teknolojisi ile güvenli ve şeffaf oylama platformu. **Zama F
 
 ## 🛠️ Teknolojiler
 
-- **Frontend**: Next.js, React, RainbowKit
+- **Frontend**: Next.js, React, RainbowKit, Wagmi
 - **Blockchain**: Ethereum, Hardhat, Solidity
 - **Şifreleme**: Zama FHEVM (Fully Homomorphic Encryption)
 - **Wallet**: MetaMask entegrasyonu
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS, Custom CSS
+- **Testing**: Hardhat, Chai, Mocha
 
 ## 📦 Kurulum
 
@@ -64,7 +65,11 @@ npx hardhat run scripts/deploy-multi.js --network localhost
 
 **Zama FHEVM Sistemi:**
 ```bash
+# Basit Zama sistemi
 npx hardhat run scripts/deploy-zama-simple.js --network localhost
+
+# Gelişmiş Zama sistemi (Önerilen)
+npx hardhat run scripts/deploy-zama-advanced-v2.js --network localhost
 ```
 
 7. **Frontend'i başlatın:**
@@ -86,6 +91,8 @@ npm run dev
 ### Zama FHEVM Sistemi
 - **Şifreli Oy**: `/zama-vote` - Şifreli oylama arayüzü
 - **Zama Admin**: `/zama-admin` - Gelişmiş admin paneli
+- **Gelişmiş Şifreli**: `/zama-advanced-vote` - Çoklu seçenek şifreli oylama
+- **Gelişmiş Admin**: `/zama-advanced-admin` - Tam özellikli yönetim paneli
 
 ## 👑 Admin Paneli Özellikleri
 
@@ -100,6 +107,14 @@ npm run dev
 - Otomatik bitiş yönetimi
 - Şifreli oy takibi
 - Gelişmiş raporlama
+
+### Zama Gelişmiş Admin (`/zama-advanced-admin`)
+- **Çoklu Seçenek**: 2-10 arası seçenek desteği
+- **Seçmen Yönetimi**: Yetkili seçmen sistemi
+- **Oy Değiştirme**: İsteğe bağlı oy değiştirme
+- **Minimum Oy**: Geçerlilik için minimum oy sayısı
+- **Toplu İşlemler**: Çoklu seçmen yetkilendirme
+- **Gelişmiş Analitik**: Detaylı istatistikler
 
 ## 🔧 Geliştirme
 
@@ -125,20 +140,25 @@ npx hardhat run scripts/deploy-zama-simple.js --network zama
 
 ```
 ├── contracts/
-│   ├── MultiVotingSystem.sol    # Klasik oylama sistemi
-│   ├── ZamaVotingSimple.sol     # Zama FHEVM sistemi
-│   └── ZamaSimpleVoting.sol     # Gelişmiş Zama sistemi
+│   ├── MultiVotingSystem.sol      # Klasik oylama sistemi
+│   ├── ZamaVotingSimple.sol       # Zama FHEVM basit sistem
+│   ├── ZamaSimpleVoting.sol       # Zama FHEVM gelişmiş sistem
+│   └── ZamaAdvancedVoting.sol     # Zama FHEVM tam özellikli sistem
 ├── scripts/
-│   ├── deploy-multi.js          # Klasik sistem deploy
-│   └── deploy-zama-simple.js    # Zama sistem deploy
+│   ├── deploy-multi.js            # Klasik sistem deploy
+│   ├── deploy-zama-simple.js      # Zama basit sistem deploy
+│   └── deploy-zama-advanced-v2.js # Zama gelişmiş sistem deploy
 ├── pages/
-│   ├── index.js                 # Ana sayfa
-│   ├── vote.js                  # Klasik oylama
-│   ├── admin.js                 # Klasik admin
-│   ├── zama-vote.js            # Zama oylama
-│   └── zama-admin.js           # Zama admin
-├── components/                  # React components
-└── artifacts/                   # Compiled contracts
+│   ├── index.js                   # Ana sayfa - sistem seçimi
+│   ├── vote.js                    # Klasik oylama
+│   ├── admin.js                   # Klasik admin
+│   ├── zama-vote.js              # Zama basit oylama
+│   ├── zama-admin.js             # Zama basit admin
+│   ├── zama-advanced-vote.js     # Zama gelişmiş oylama
+│   └── zama-advanced-admin.js    # Zama gelişmiş admin
+├── components/                    # React components
+├── test/                         # Test dosyaları
+└── artifacts/                    # Compiled contracts
 ```
 
 ## 🔒 Güvenlik Özellikleri
@@ -175,6 +195,7 @@ git push origin main
 3. **Environment Variables (Vercel Dashboard'da):**
    - `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`: `2f5a2b1c8d3e4f5a6b7c8d9e0f1a2b3c`
    - `NEXT_PUBLIC_MULTI_CONTRACT_ADDRESS`: `0xd571Ef424422BD0F843E8026d7Fa5808879B1B81`
+   - `NEXT_PUBLIC_ZAMA_ADVANCED_CONTRACT_ADDRESS`: Deploy sonrası eklenecek
 
 4. **Deploy Durumu:**
    - ✅ Contract deployed: Sepolia testnet
