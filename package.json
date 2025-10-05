@@ -1,7 +1,24 @@
 {
-  "name": "gizli-oy-sistemi",
-  "version": "1.0.0",
-  "description": "Confidential Voting dApp using Zama FHEVM",
+  "name": "zamam-voting",
+  "version": "2.0.0",
+  "description": "Secure blockchain voting system with multilingual support on Sepolia testnet",
+  "author": "Suat AYAZ <suatayaz@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sazy67/zamam-voting.git"
+  },
+  "homepage": "https://zamam.vercel.app",
+  "keywords": [
+    "blockchain",
+    "voting",
+    "ethereum",
+    "nextjs",
+    "smart-contracts",
+    "sepolia",
+    "multilingual",
+    "dapp"
+  ],
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
@@ -11,10 +28,11 @@
     "build": "next build",
     "start": "next start",
     "compile": "hardhat compile",
-    "deploy-multi": "hardhat run scripts/deploy-multi.js --network sepolia",
-    "deploy-zama-simple": "hardhat run scripts/deploy-zama-simple.js --network zama",
-    "deploy-zama-advanced": "hardhat run scripts/deploy-zama-advanced.js --network zama",
-    "deploy-all": "npm run deploy-multi && npm run deploy-zama-simple",
+    "deploy": "hardhat run scripts/deploy-sepolia.js --network sepolia",
+    "deploy-simple": "hardhat run scripts/deploy-simple-voting.js --network sepolia",
+    "check-contract": "hardhat run scripts/check-contract.js --network sepolia",
+    "authorize-voter": "hardhat run scripts/authorize-voter.js --network sepolia",
+    "create-test": "hardhat run scripts/create-test-voting.js --network sepolia",
     "test": "hardhat test",
     "vercel-build": "npm run build"
   },

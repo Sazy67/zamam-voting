@@ -41,3 +41,4 @@ zama-simple-contract-info.json
 
 # Vercel
 .vercel
+.env*.local

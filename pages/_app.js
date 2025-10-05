@@ -48,15 +48,18 @@ const { chains, publicClient } = configureChains(
   [publicProvider()]
 );
 
-// Leap Wallet ve diğer cüzdanları ekle
+// WalletConnect Project ID
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '4f06fc565986980fd397c9fbd6e54ba1';
+
+// Wallet connectors
 const connectors = connectorsForWallets([
   {
     groupName: 'Önerilen',
     wallets: [
-      injectedWallet({ chains }), // Leap Wallet burada algılanacak
-      metaMaskWallet({ projectId: 'YOUR_PROJECT_ID', chains }),
-      walletConnectWallet({ projectId: 'YOUR_PROJECT_ID', chains }),
-      coinbaseWallet({ appName: 'Gizli Oy Sistemi', chains }),
+      injectedWallet({ chains }),
+      metaMaskWallet({ projectId, chains }),
+      walletConnectWallet({ projectId, chains }),
+      coinbaseWallet({ appName: 'ZamaVote', chains }),
     ],
   },
 ]);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
+import { translateVoting } from '../utils/translator';
 
 // Language translations
 const translations = {
@@ -99,8 +100,8 @@ const translations = {
   }
 };
 
-// Contract bilgileri
-const CONTRACT_ADDRESS = "0x9f2032a8Add12a036e3D529Ae1b21A0EDB9C63CB";
+// Contract bilgileri - Sepolia Testnet
+const CONTRACT_ADDRESS = "0xf43b398501525177c95544dc0B058d7CAA321d8F";
 const CONTRACT_ABI = [
   "function owner() view returns (address)",
   "function getVotingCount() view returns (uint256)",
@@ -130,20 +131,96 @@ export default function Home() {
   const [options, setOptions] = useState(['', '']);
   const [duration, setDuration] = useState(24);
 
+  // Add Zama network to MetaMask
+  const addZamaNetwork = async () => {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: '0x1F49', // 8009 in hex
+          chainName: 'Zama Devnet',
+          rpcUrls: ['https://devnet.zama.ai'],
+          nativeCurrency: {
+            name: 'ZAMA',
+            symbol: 'ZAMA',
+            decimals: 18,
+          },
+          blockExplorerUrls: ['https://explorer.zama.ai'],
+        }],
+      });
+      return true;
+    } catch (error) {
+      console.error('Failed to add Zama network:', error);
+      return false;
+    }
+  };
+
+  // Switch to Zama network
+  const switchToZamaNetwork = async () => {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x1F49' }], // 8009 in hex
+      });
+      return true;
+    } catch (error) {
+      if (error.code === 4902) {
+        // Network not added, try to add it
+        return await addZamaNetwork();
+      }
+      console.error('Failed to switch to Zama network:', error);
+      return false;
+    }
+  };
+
   // Connect wallet
   const connectWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
       try {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         const provider = new ethers.BrowserProvider(window.ethereum);
+        const network = await provider.getNetwork();
+        console.log('Current network:', network);
+        console.log('Chain ID:', network.chainId);
+
+        // Check if we're on Sepolia network
+        if (Number(network.chainId) !== 11155111) {
+          console.log('Wrong network detected, switching to Sepolia...');
+          try {
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0xaa36a7' }], // Sepolia chain ID in hex
+            });
+            // Network değişikliği sonrası yeniden bağlan
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            window.location.reload();
+            return;
+          } catch (switchError) {
+            console.error('Network switch failed:', switchError);
+            alert('Lütfen MetaMask\'ta Sepolia Testnet\'e geçin');
+            return;
+          }
+        }
+
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
         setAccount(address);
 
         // Check if owner
         const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
-        const owner = await contract.owner();
-        setIsOwner(address.toLowerCase() === owner.toLowerCase());
+        console.log('Checking owner...');
+        console.log('Connected address:', address);
+        console.log('Contract address:', CONTRACT_ADDRESS);
+
+        try {
+          const owner = await contract.owner();
+          console.log('Contract owner:', owner);
+          console.log('Address match:', address.toLowerCase() === owner.toLowerCase());
+          setIsOwner(address.toLowerCase() === owner.toLowerCase());
+        } catch (error) {
+          console.error('Owner check failed:', error);
+          setIsOwner(false);
+        }
 
         await loadVotings();
       } catch (error) {
@@ -155,7 +232,7 @@ export default function Home() {
   };
 
   // Load votings
-  const loadVotings = async () => {
+  const loadVotings = async (currentLanguage = language) => {
     if (!account) return;
 
     try {
@@ -177,7 +254,7 @@ export default function Home() {
         // Skip if proposal is empty (deleted voting)
         if (!info[0]) continue;
 
-        votingList.push({
+        let votingData = {
           id: i,
           proposal: info[0],
           options: info[1],
@@ -189,7 +266,16 @@ export default function Home() {
           totalVoters: Number(info[7]),
           timeRemaining: Number(timeRemaining),
           hasVoted
-        });
+        };
+
+        // Dil ayarına göre çeviri uygula
+        if (currentLanguage === 'en') {
+          console.log('Translating voting:', votingData.proposal);
+          votingData = translateVoting(votingData, currentLanguage);
+          console.log('Translated to:', votingData.proposal);
+        }
+
+        votingList.push(votingData);
       }
 
       setVotings(votingList);
@@ -328,22 +414,22 @@ export default function Home() {
     const minutes = Math.floor((seconds % 3600) / 60);
 
     if (hours > 0) {
-      return language === 'tr' 
+      return language === 'tr'
         ? `${hours} saat ${minutes} dakika`
         : `${hours} hours ${minutes} minutes`;
     }
-    return language === 'tr' 
+    return language === 'tr'
       ? `${minutes} dakika`
       : `${minutes} minutes`;
   };
 
   useEffect(() => {
     if (account) {
-      loadVotings();
-      const interval = setInterval(loadVotings, 30000);
+      loadVotings(language);
+      const interval = setInterval(() => loadVotings(language), 30000);
       return () => clearInterval(interval);
     }
-  }, [account]);
+  }, [account, language]); // language dependency eklendi
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -376,7 +462,10 @@ export default function Home() {
                 {/* Language Switcher */}
                 <div className="flex bg-white/10 rounded-lg p-1">
                   <button
-                    onClick={() => setLanguage('tr')}
+                    onClick={() => {
+                      setLanguage('tr');
+                      if (account) loadVotings('tr');
+                    }}
                     className={`px-3 py-1 rounded text-sm font-medium transition-all ${language === 'tr'
                       ? 'bg-white text-purple-900'
                       : 'text-white hover:bg-white/20'
@@ -385,7 +474,10 @@ export default function Home() {
                     🇹🇷 TR
                   </button>
                   <button
-                    onClick={() => setLanguage('en')}
+                    onClick={() => {
+                      setLanguage('en');
+                      if (account) loadVotings('en');
+                    }}
                     className={`px-3 py-1 rounded text-sm font-medium transition-all ${language === 'en'
                       ? 'bg-white text-purple-900'
                       : 'text-white hover:bg-white/20'

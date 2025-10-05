@@ -4,15 +4,15 @@ import { ethers } from 'ethers';
 // FHEVM instance
 let fhevmInstance = null;
 
-// Zama FHEVM network configuration
-export const ZAMA_NETWORK = {
-  chainId: 8009,
-  name: 'Zama FHEVM Testnet',
-  rpcUrl: 'https://devnet.zama.ai',
-  blockExplorer: 'https://explorer.zama.ai',
+// Sepolia Testnet network configuration
+export const SEPOLIA_NETWORK = {
+  chainId: 11155111,
+  name: 'Sepolia Testnet',
+  rpcUrl: 'https://ethereum-sepolia-rpc.publicnode.com',
+  blockExplorer: 'https://sepolia.etherscan.io',
   nativeCurrency: {
-    name: 'ZAMA',
-    symbol: 'ZAMA',
+    name: 'Ethereum',
+    symbol: 'ETH',
     decimals: 18,
   },
 };
@@ -35,19 +35,15 @@ export const ZAMA_ADVANCED_ABI = [
   "function createVoting(string, string[], uint256) returns (uint256)"
 ];
 
-// Contract address
-export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_ZAMA_ADVANCED_CONTRACT_ADDRESS || "0xE2DAE8F0F9Cfa1726B21097c71c9EA9a76E1714f";
+// Contract address - Sepolia Testnet
+export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_ZAMA_CONTRACT_ADDRESS || "0xf43b398501525177c95544dc0B058d7CAA321d8F";
 
-// Initialize FHEVM instance
+// Initialize FHEVM instance - Sepolia için devre dışı
 export const initFhevm = async () => {
   try {
-    if (!fhevmInstance) {
-      fhevmInstance = await createFhevmInstance({
-        chainId: ZAMA_NETWORK.chainId,
-        publicKeyId: '0x1234567890abcdef', // Bu gerçek public key olmalı
-      });
-    }
-    return fhevmInstance;
+    // Sepolia testnet için FHEVM kullanmıyoruz, normal voting
+    console.log('FHEVM disabled for Sepolia testnet');
+    return null;
   } catch (error) {
     console.error('FHEVM initialization failed:', error);
     return null;
@@ -121,49 +117,49 @@ export const mockEncryptVote = (optionIndex) => {
   };
 };
 
-// Utility to check if we're on Zama network
-export const isZamaNetwork = (chainId) => {
-  return chainId === ZAMA_NETWORK.chainId;
+// Utility to check if we're on Sepolia network
+export const isSepoliaNetwork = (chainId) => {
+  return chainId === SEPOLIA_NETWORK.chainId;
 };
 
-// Add Zama network to wallet
-export const addZamaNetwork = async () => {
+// Add Sepolia network to wallet
+export const addSepoliaNetwork = async () => {
   if (typeof window !== 'undefined' && window.ethereum) {
     try {
       await window.ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [{
-          chainId: `0x${ZAMA_NETWORK.chainId.toString(16)}`,
-          chainName: ZAMA_NETWORK.name,
-          rpcUrls: [ZAMA_NETWORK.rpcUrl],
-          nativeCurrency: ZAMA_NETWORK.nativeCurrency,
-          blockExplorerUrls: [ZAMA_NETWORK.blockExplorer],
+          chainId: `0x${SEPOLIA_NETWORK.chainId.toString(16)}`,
+          chainName: SEPOLIA_NETWORK.name,
+          rpcUrls: [SEPOLIA_NETWORK.rpcUrl],
+          nativeCurrency: SEPOLIA_NETWORK.nativeCurrency,
+          blockExplorerUrls: [SEPOLIA_NETWORK.blockExplorer],
         }],
       });
       return true;
     } catch (error) {
-      console.error('Failed to add Zama network:', error);
+      console.error('Failed to add Sepolia network:', error);
       return false;
     }
   }
   return false;
 };
 
-// Switch to Zama network
-export const switchToZamaNetwork = async () => {
+// Switch to Sepolia network
+export const switchToSepoliaNetwork = async () => {
   if (typeof window !== 'undefined' && window.ethereum) {
     try {
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: `0x${ZAMA_NETWORK.chainId.toString(16)}` }],
+        params: [{ chainId: `0x${SEPOLIA_NETWORK.chainId.toString(16)}` }],
       });
       return true;
     } catch (error) {
       if (error.code === 4902) {
         // Network not added, try to add it
-        return await addZamaNetwork();
+        return await addSepoliaNetwork();
       }
-      console.error('Failed to switch to Zama network:', error);
+      console.error('Failed to switch to Sepolia network:', error);
       return false;
     }
   }
