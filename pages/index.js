@@ -913,7 +913,7 @@ export default function Home() {
                 <div className="w-8 h-8 flex items-center justify-center">
                   <img src="/logo.svg" alt="ZamaVote Logo" className="w-8 h-8" />
                 </div>
-                <span className="text-gray-400">© 2024 ZamaVote. Powered by Zama FHE</span>
+                <span className="text-gray-400">© 2025 ZamaVote. Powered by Zama FHE  (Suat AYAZ) </span>
               </div>
 
               {/* Developer Credit - Footer */}

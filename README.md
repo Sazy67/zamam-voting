@@ -61,20 +61,92 @@ NEXT_PUBLIC_NETWORK_NAME=Sepolia Testnet
 NEXT_PUBLIC_CHAIN_ID=11155111
 ```
 
+<<<<<<< HEAD
 5. **Run development server**
+=======
+5. **Local blockchain başlatın:**
+```bash
+npx hardhat node
+```
+
+6. **Contract'ları deploy edin:**
+
+**Klasik Sistem:**
+```bash
+npx hardhat run scripts/deploy-multi.js --network localhost
+```
+
+**Zama FHEVM Sistemi:**
+```bash
+# Basit Zama sistemi
+npx hardhat run scripts/deploy-zama-simple.js --network localhost
+
+```
+
+7. **Frontend'i başlatın:**
+>>>>>>> 38bca574a6889032073643ee9521fc66298db8bd
 ```bash
 npm run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to see the application.
 
+<<<<<<< HEAD
 ## 📁 Project Structure
+=======
+### Ana Sayfa (`/`)
+- İki sistem arasında seçim yapın
+- Aktif oylamaları görün ve katılın
+- Sonuçları gerçek zamanlı takip edin
+
+### Klasik Sistem
+- **Oy Verme**: `/vote` - Standart oylama arayüzü
+- **Admin Panel**: `/admin` - Oylama yönetimi
+
+### Zama FHEVM Sistemi
+- **Şifreli Oy**: `/zama-vote` - Şifreli oylama arayüzü
+- **Zama Admin**: `/zama-admin` - Gelişmiş admin paneli
+- **Gelişmiş Şifreli**: `/zama-advanced-vote` - Çoklu seçenek şifreli oylama
+- **Gelişmiş Admin**: `/zama-advanced-admin` - Tam özellikli yönetim paneli
+
+## 👑 Admin Paneli Özellikleri
+
+### Klasik Admin (`/admin`)
+- Yeni oylama oluşturma
+- Oylamaları başlatma/durdurma
+- Sonuçları açıklama
+- Detaylı istatistikler
+
+
+## 🔧 Geliştirme
+
+### Test Etme
+```bash
+npx hardhat test
+```
+
+### Farklı Network'lere Deploy
+
+**Sepolia Testnet:**
+```bash
+npx hardhat run scripts/deploy-multi.js --network sepolia
+npx hardhat run scripts/deploy-zama-simple.js --network sepolia
+```
+
+**Zama Devnet:**
+```bash
+npx hardhat run scripts/deploy-zama-simple.js --network zama
+```
+
+## 📁 Proje Yapısı
+>>>>>>> 38bca574a6889032073643ee9521fc66298db8bd
 
 ```
 zamam-voting/
 ├── contracts/
 │   └── SimpleVoting.sol          # Main voting smart contract
 ├── pages/
+<<<<<<< HEAD
 │   ├── index.js                  # Main voting interface
 │   ├── admin.js                  # Admin management panel
 │   ├── _app.js                   # Next.js app wrapper
@@ -92,6 +164,16 @@ zamam-voting/
 └── public/
     ├── logo.svg                  # Application logo
     └── favicon.ico               # Favicon
+=======
+│   ├── index.js                   # Ana sayfa - sistem seçimi
+│   ├── vote.js                    # Klasik oylama
+│   ├── admin.js                   # Klasik admin
+│   ├── zama-vote.js              # Zama basit oylama
+│   ├── zama-admin.js             # Zama basit admin
+├── components/                    # React components
+├── test/                         # Test dosyaları
+└── artifacts/                    # Compiled contracts
+>>>>>>> 38bca574a6889032073643ee9521fc66298db8bd
 ```
 
 ## 🎮 Usage
@@ -104,6 +186,7 @@ zamam-voting/
 4. **Cast Vote**: Select your choice and submit vote
 5. **View Results**: See real-time voting results
 
+<<<<<<< HEAD
 ### For Administrators
 
 1. **Access Admin Panel**: Connect with owner wallet address
@@ -191,10 +274,38 @@ npx hardhat run scripts/check-contract.js --network sepolia
 # Create test voting
 npx hardhat run scripts/create-test-voting.js --network sepolia
 ```
+=======
+>>>>>>> 38bca574a6889032073643ee9521fc66298db8bd
 
 ## 📊 Network Information
 
+<<<<<<< HEAD
 - **Network**: Sepolia Testnet
+=======
+🌐 **Live Demo**: https://zamam-3ef8w72sj-suat-ayazs-projects.vercel.app
+
+### 📱 Sayfalar
+- **Ana Sayfa** (`/`): Sistem seçimi ve genel bakış
+- **Klasik Oylama** (`/vote`): Standart blockchain oylama
+- **Admin Panelleri**: Her sistem için yönetim arayüzü
+
+### 🎮 Demo Özellikleri
+- ✅ Cüzdan bağlama (MetaMask)
+- ✅ Çoklu oylama sistemi
+- ✅ Gerçek zamanlı arayüz
+- ✅ Responsive tasarım
+- ✅ Demo veriler ile test
+
+## 🌐 Network Bilgileri
+
+### Zama FHEVM Testnet
+- **Chain ID**: 8009
+- **RPC URL**: https://devnet.zama.ai
+- **Explorer**: https://explorer.devnet.zama.ai
+- **Faucet**: [Zama Discord](https://discord.gg/zama)
+
+### Sepolia Testnet
+>>>>>>> 38bca574a6889032073643ee9521fc66298db8bd
 - **Chain ID**: 11155111
 - **RPC URL**: https://sepolia.infura.io/v3/YOUR_PROJECT_ID
 - **Block Explorer**: https://sepolia.etherscan.io/
@@ -226,5 +337,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - MetaMask integration for wallet connectivity
 
 ---
+<<<<<<< HEAD
 
 ⭐ **Star this repository if you found it helpful!**
+=======
+suatayaz@gmail.com
+@suatayaz_
+**🔐 Powered by Zama FHEVM - Blockchain'de Tam Gizlilik!**
+>>>>>>> 38bca574a6889032073643ee9521fc66298db8bd
