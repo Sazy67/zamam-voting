@@ -61,92 +61,20 @@ NEXT_PUBLIC_NETWORK_NAME=Sepolia Testnet
 NEXT_PUBLIC_CHAIN_ID=11155111
 ```
 
-<<<<<<< HEAD
 5. **Run development server**
-=======
-5. **Local blockchain başlatın:**
-```bash
-npx hardhat node
-```
-
-6. **Contract'ları deploy edin:**
-
-**Klasik Sistem:**
-```bash
-npx hardhat run scripts/deploy-multi.js --network localhost
-```
-
-**Zama FHEVM Sistemi:**
-```bash
-# Basit Zama sistemi
-npx hardhat run scripts/deploy-zama-simple.js --network localhost
-
-```
-
-7. **Frontend'i başlatın:**
->>>>>>> 38bca574a6889032073643ee9521fc66298db8bd
 ```bash
 npm run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to see the application.
 
-<<<<<<< HEAD
 ## 📁 Project Structure
-=======
-### Ana Sayfa (`/`)
-- İki sistem arasında seçim yapın
-- Aktif oylamaları görün ve katılın
-- Sonuçları gerçek zamanlı takip edin
-
-### Klasik Sistem
-- **Oy Verme**: `/vote` - Standart oylama arayüzü
-- **Admin Panel**: `/admin` - Oylama yönetimi
-
-### Zama FHEVM Sistemi
-- **Şifreli Oy**: `/zama-vote` - Şifreli oylama arayüzü
-- **Zama Admin**: `/zama-admin` - Gelişmiş admin paneli
-- **Gelişmiş Şifreli**: `/zama-advanced-vote` - Çoklu seçenek şifreli oylama
-- **Gelişmiş Admin**: `/zama-advanced-admin` - Tam özellikli yönetim paneli
-
-## 👑 Admin Paneli Özellikleri
-
-### Klasik Admin (`/admin`)
-- Yeni oylama oluşturma
-- Oylamaları başlatma/durdurma
-- Sonuçları açıklama
-- Detaylı istatistikler
-
-
-## 🔧 Geliştirme
-
-### Test Etme
-```bash
-npx hardhat test
-```
-
-### Farklı Network'lere Deploy
-
-**Sepolia Testnet:**
-```bash
-npx hardhat run scripts/deploy-multi.js --network sepolia
-npx hardhat run scripts/deploy-zama-simple.js --network sepolia
-```
-
-**Zama Devnet:**
-```bash
-npx hardhat run scripts/deploy-zama-simple.js --network zama
-```
-
-## 📁 Proje Yapısı
->>>>>>> 38bca574a6889032073643ee9521fc66298db8bd
 
 ```
 zamam-voting/
 ├── contracts/
 │   └── SimpleVoting.sol          # Main voting smart contract
 ├── pages/
-<<<<<<< HEAD
 │   ├── index.js                  # Main voting interface
 │   ├── admin.js                  # Admin management panel
 │   ├── _app.js                   # Next.js app wrapper
@@ -164,16 +92,6 @@ zamam-voting/
 └── public/
     ├── logo.svg                  # Application logo
     └── favicon.ico               # Favicon
-=======
-│   ├── index.js                   # Ana sayfa - sistem seçimi
-│   ├── vote.js                    # Klasik oylama
-│   ├── admin.js                   # Klasik admin
-│   ├── zama-vote.js              # Zama basit oylama
-│   ├── zama-admin.js             # Zama basit admin
-├── components/                    # React components
-├── test/                         # Test dosyaları
-└── artifacts/                    # Compiled contracts
->>>>>>> 38bca574a6889032073643ee9521fc66298db8bd
 ```
 
 ## 🎮 Usage
@@ -186,7 +104,6 @@ zamam-voting/
 4. **Cast Vote**: Select your choice and submit vote
 5. **View Results**: See real-time voting results
 
-<<<<<<< HEAD
 ### For Administrators
 
 1. **Access Admin Panel**: Connect with owner wallet address
@@ -274,38 +191,10 @@ npx hardhat run scripts/check-contract.js --network sepolia
 # Create test voting
 npx hardhat run scripts/create-test-voting.js --network sepolia
 ```
-=======
->>>>>>> 38bca574a6889032073643ee9521fc66298db8bd
 
 ## 📊 Network Information
 
-<<<<<<< HEAD
 - **Network**: Sepolia Testnet
-=======
-🌐 **Live Demo**: https://zamam-3ef8w72sj-suat-ayazs-projects.vercel.app
-
-### 📱 Sayfalar
-- **Ana Sayfa** (`/`): Sistem seçimi ve genel bakış
-- **Klasik Oylama** (`/vote`): Standart blockchain oylama
-- **Admin Panelleri**: Her sistem için yönetim arayüzü
-
-### 🎮 Demo Özellikleri
-- ✅ Cüzdan bağlama (MetaMask)
-- ✅ Çoklu oylama sistemi
-- ✅ Gerçek zamanlı arayüz
-- ✅ Responsive tasarım
-- ✅ Demo veriler ile test
-
-## 🌐 Network Bilgileri
-
-### Zama FHEVM Testnet
-- **Chain ID**: 8009
-- **RPC URL**: https://devnet.zama.ai
-- **Explorer**: https://explorer.devnet.zama.ai
-- **Faucet**: [Zama Discord](https://discord.gg/zama)
-
-### Sepolia Testnet
->>>>>>> 38bca574a6889032073643ee9521fc66298db8bd
 - **Chain ID**: 11155111
 - **RPC URL**: https://sepolia.infura.io/v3/YOUR_PROJECT_ID
 - **Block Explorer**: https://sepolia.etherscan.io/
@@ -337,11 +226,238 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - MetaMask integration for wallet connectivity
 
 ---
-<<<<<<< HEAD
 
 ⭐ **Star this repository if you found it helpful!**
-=======
-suatayaz@gmail.com
-@suatayaz_
-**🔐 Powered by Zama FHEVM - Blockchain'de Tam Gizlilik!**
->>>>>>> 38bca574a6889032073643ee9521fc66298db8bd
+
+---
+
+# 🇹🇷 ZamaVote - Blockchain Oylama Sistemi
+
+🗳️ **Sepolia Testnet üzerinde güvenli, şeffaf ve çok dilli oylama sistemi**
+
+ZamaVote, güvenli, şeffaf ve doğrulanabilir oylama sağlayan modern bir blockchain tabanlı oylama uygulamasıdır. Türkçe/İngilizce çok dilli desteği ile gelir.
+
+## ✨ Özellikler
+
+- 🔐 **Güvenli Oylama**: Güvenli kimlik doğrulama için MetaMask cüzdan entegrasyonu
+- 🌐 **Çok Dilli**: Otomatik çeviri ile tam Türkçe/İngilizce dil desteği
+- ⚡ **Gerçek Zamanlı**: Canlı oylama sonuçları ve durum güncellemeleri
+- 🎯 **Kullanıcı Dostu**: Responsive tasarım ile temiz, modern arayüz
+- 👑 **Admin Paneli**: Yöneticiler için eksiksiz oylama yönetim sistemi
+- 🔍 **Şeffaf**: Tüm oylar Sepolia blockchain'inde kayıtlı
+- 📱 **Responsive**: Masaüstü ve mobilde mükemmel çalışır
+
+## 🚀 Canlı Demo
+
+- **Production**: [https://zamam.vercel.app](https://zamam.vercel.app)
+- **Network**: Sepolia Testnet
+- **Contract**: `0xf43b398501525177c95544dc0B058d7CAA321d8F`
+
+## 🛠️ Teknoloji Yığını
+
+- **Frontend**: Next.js 14, React 18, Tailwind CSS
+- **Blockchain**: Ethereum (Sepolia Testnet)
+- **Akıllı Kontratlar**: Solidity, Hardhat
+- **Cüzdan**: ethers.js v6 ile MetaMask entegrasyonu
+- **Deployment**: Vercel
+- **Çeviri**: Özel çeviri sistemi
+
+## 📋 Gereksinimler
+
+- Node.js 18+ 
+- MetaMask tarayıcı eklentisi
+- Sepolia testnet ETH ([Sepolia Faucet](https://sepoliafaucet.com/)'ten alın)
+
+## 🔧 Kurulum
+
+1. **Repository'yi klonlayın**
+```bash
+git clone https://github.com/Sazy67/zamam-voting.git
+cd zamam-voting
+```
+
+2. **Bağımlılıkları yükleyin**
+```bash
+npm install
+```
+
+3. **Environment kurulumu**
+```bash
+cp .env.example .env.local
+```
+
+4. **Environment değişkenlerini yapılandırın**
+```env
+# .env.local
+NEXT_PUBLIC_CONTRACT_ADDRESS=0xf43b398501525177c95544dc0B058d7CAA321d8F
+NEXT_PUBLIC_NETWORK_NAME=Sepolia Testnet
+NEXT_PUBLIC_CHAIN_ID=11155111
+```
+
+5. **Geliştirme sunucusunu çalıştırın**
+```bash
+npm run dev
+```
+
+Uygulamayı görmek için [http://localhost:3000](http://localhost:3000) adresini ziyaret edin.
+
+## 📁 Proje Yapısı
+
+```
+zamam-voting/
+├── contracts/
+│   └── SimpleVoting.sol          # Ana oylama akıllı kontratı
+├── pages/
+│   ├── index.js                  # Ana oylama arayüzü
+│   ├── admin.js                  # Admin yönetim paneli
+│   ├── _app.js                   # Next.js app wrapper
+│   └── _document.js              # Özel document
+├── utils/
+│   ├── translator.js             # Çeviri sistemi
+│   ├── contract.js               # Kontrat yardımcıları
+│   └── fhevm.js                  # Blockchain yardımcıları
+├── scripts/
+│   ├── deploy-sepolia.js         # Kontrat deployment
+│   ├── authorize-voter.js        # Oy veren yetkilendirme
+│   └── check-contract.js         # Kontrat doğrulama
+├── styles/
+│   └── globals.css               # Global stiller
+└── public/
+    ├── logo.svg                  # Uygulama logosu
+    └── favicon.ico               # Favicon
+```
+
+## 🎮 Kullanım
+
+### Oy Verenler İçin
+
+1. **Cüzdan Bağla**: "MetaMask ile Bağlan" butonuna tıklayın
+2. **Network Değiştir**: Otomatik olarak Sepolia testnet'e geçer
+3. **Oylamaları Görüntüle**: Aktif oylama önerilerini inceleyin
+4. **Oy Ver**: Seçiminizi yapın ve oyunuzu gönderin
+5. **Sonuçları Görüntüle**: Gerçek zamanlı oylama sonuçlarını görün
+
+### Yöneticiler İçin
+
+1. **Admin Paneline Erişim**: Sahip cüzdan adresi ile bağlanın
+2. **Oylama Oluştur**: Başlık, seçenekler ve süre belirleyin
+3. **Oylamaları Yönet**: Oylamaları başlatın, bitirin veya sonuçları açıklayın
+4. **Oy Veren Yetkilendir**: Adreslere oylama izni verin
+5. **Oylamaları Sil**: Tamamlanan veya istenmeyen oylamaları kaldırın
+
+### Dil Değiştirme
+
+- Header'daki 🇹🇷 TR / 🇺🇸 EN butonlarına tıklayın
+- Arayüz ve oylama içeriği otomatik olarak çevrilir
+- Çeviriler hem ana sayfada hem admin panelinde çalışır
+
+## 🔐 Akıllı Kontrat
+
+`SimpleVoting.sol` kontratı şunları sağlar:
+
+- **Oylama Oluşturma**: Çoklu seçenekli yeni oylama önerileri oluşturma
+- **Erişim Kontrolü**: Sadece sahip için yönetici fonksiyonları
+- **Oy Veren Yetkilendirme**: Whitelist tabanlı oylama izinleri
+- **Zaman Yönetimi**: Otomatik oylama süresi kontrolü
+- **Sonuç Açıklama**: Güvenli sonuç açıklama sistemi
+- **Oylama Silme**: İstenmeyen oylama önerilerini kaldırma
+
+### Ana Fonksiyonlar
+
+```solidity
+function createVoting(string memory _proposal, string[] memory _options, uint256 _durationHours) external onlyOwner
+function vote(uint256 _votingId, uint32 _optionIndex) external
+function startVoting(uint256 _votingId) external onlyOwner
+function endVoting(uint256 _votingId) external onlyOwner
+function revealResults(uint256 _votingId) external onlyOwner
+function authorizeVoter(address _voter) external onlyOwner
+function deleteVoting(uint256 _votingId) external onlyOwner
+```
+
+## 🌐 Çeviri Sistemi
+
+ZamaVote kapsamlı bir çeviri sistemi içerir:
+
+- **Otomatik Algılama**: Türkçe içeriği algılar ve İngilizce'ye çevirir
+- **Kapsamlı Kapsama**: Oylama başlıkları, seçenekler ve UI öğeleri
+- **Gerçek Zamanlı Çeviri**: Anında dil değiştirme
+- **Genişletilebilir**: Yeni diller ve çeviriler eklenmesi kolay
+
+### Yeni Çeviriler Ekleme
+
+`utils/translator.js` dosyasını düzenleyin:
+
+```javascript
+const translations = {
+  'Türkçe Metin': 'English Translation',
+  // Daha fazla çeviri ekleyin...
+};
+```
+
+## 🚀 Deployment
+
+### Vercel'e Deploy
+
+1. **GitHub repository'sini Vercel'e bağlayın**
+2. **Vercel dashboard'unda environment değişkenlerini ayarlayın**
+3. **Main branch'e push'ta otomatik deploy**
+
+### Akıllı Kontrat Deploy
+
+```bash
+# Sepolia testnet'e deploy
+npx hardhat run scripts/deploy-sepolia.js --network sepolia
+
+# Kontratı doğrula (opsiyonel)
+npx hardhat verify --network sepolia CONTRACT_ADDRESS
+```
+
+## 🧪 Test Etme
+
+```bash
+# Testleri çalıştır
+npm test
+
+# Kontratı kontrol et
+npx hardhat run scripts/check-contract.js --network sepolia
+
+# Test oylaması oluştur
+npx hardhat run scripts/create-test-voting.js --network sepolia
+```
+
+## 📊 Network Bilgileri
+
+- **Network**: Sepolia Testnet
+- **Chain ID**: 11155111
+- **RPC URL**: https://sepolia.infura.io/v3/YOUR_PROJECT_ID
+- **Block Explorer**: https://sepolia.etherscan.io/
+- **Faucet**: https://sepoliafaucet.com/
+
+## 🤝 Katkıda Bulunma
+
+1. Repository'yi fork edin
+2. Feature branch'inizi oluşturun (`git checkout -b feature/amazing-feature`)
+3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
+4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
+5. Pull Request açın
+
+## 📄 Lisans
+
+Bu proje MIT Lisansı altında lisanslanmıştır - detaylar için [LICENSE](LICENSE) dosyasına bakın.
+
+## 👨‍💻 Geliştirici
+
+**Suat AYAZ**
+- Twitter: [@suatayaz_](https://x.com/suatayaz_)
+- GitHub: [Sazy67](https://github.com/Sazy67)
+
+## 🙏 Teşekkürler
+
+- Next.js ve Tailwind CSS ile geliştirildi
+- Vercel'de deploy edildi
+- Ethereum blockchain ile güçlendirildi
+- Cüzdan bağlantısı için MetaMask entegrasyonu
+
+---
+
+⭐ **Bu repository'yi faydalı bulduysanız yıldızlamayı unutmayın!**
