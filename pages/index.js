@@ -7,7 +7,7 @@ const translations = {
   tr: {
     title: "ZamaVote",
     subtitle: "Tam Homomorfik Şifreleme ile Oylama",
-    heroTitle: "Blockchain Üzerinde Gizli Oylama",
+    heroTitle: "Blockchain Üzerinde FHE ile  Gizli Oylama",
     heroSubtitle: "Fully Homomorphic Encryption ile güvenli, şeffaf ve gizli oylama sistemi. Oylarınız şifreli kalır, sonuçlar doğrulanabilir.",
     connectWallet: "MetaMask ile Bağlan",
     poweredBy: "Geliştiren: Suat AYAZ",
@@ -939,7 +939,7 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  X (Twitter)
+                  X
                 </a>
                 <a
                   href="https://zama.ai"
