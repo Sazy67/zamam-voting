@@ -1,2 +1,1 @@
-# 🔧 Vercel Environment Variables Setup
 
